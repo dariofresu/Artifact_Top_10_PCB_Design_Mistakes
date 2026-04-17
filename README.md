@@ -37,3 +37,5 @@ A self-contained `index.html` file that turns the PDF guide into a full interact
 © 2026 Fresu Electronics SRL — All rights reserved  
 Resale or redistribution of this material is strictly prohibited.  
 [fresuelectronics.com](https://fresuelectronics.com)
+
+<!-- CDN purge: 2026-04-17T06:16:42Z -->
