@@ -2,189 +2,236 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Hardware Specification Guide — Fresu Electronics</title>
-<meta name="description" content="Define your hardware product spec before you touch a schematic. Interactive spec capture tool by Dario Fresu.">
+<meta name="description" content="Define your hardware product spec before you touch a schematic. Engineering-grade interactive spec capture tool by Dario Fresu.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0a0a0a;
-  --surface:#141414;
-  --surface-2:#1c1c1c;
-  --surface-3:#242424;
-  --border:#383838;        /* was #242424 — FIXED */
-  --border-focus:#555555;  /* visible interactive border */
-  --fg:#ffffff;
-  --fg-2:#e8edf5;          /* was fg-secondary */
-  --fg-3:#c8d0dc;          /* hints, captions — visible */
-  --accent:#00FF94;
-  --accent-dim:rgba(0,255,148,.12);
-  --accent-mid:rgba(0,255,148,.25);
-  --star-off:#555555;      /* FIXED — was #242424, invisible */
-  --wrong:#ff4d4d;
+  --bg:#0a0a0a; --s:#111111; --s2:#181818; --s3:#232323;
+  --b:#383838; --bf:#585858; --bh:#00FF94;
+  --fg:#ffffff; --f2:#e8edf5; --f3:#c8d0dc; --f4:#a0aab8;
+  --ac:#00FF94; --ad:rgba(0,255,148,.10); --am:rgba(0,255,148,.18);
+  --risk:#f59e0b; --rd:rgba(245,158,11,.12);
+  --danger:#ff4d4d; --dd:rgba(255,77,77,.10);
+  --info:#60a5fa; --id:rgba(96,165,250,.10);
+  --star:#555555;
   --ease:cubic-bezier(0.22,1,0.36,1);
   --mono:'JetBrains Mono',monospace;
 }
-html{scroll-behavior:smooth;height:100%}
-body{background:var(--bg);color:var(--fg);font-family:'Poppins',sans-serif;font-size:15px;line-height:1.7;overflow:hidden;height:100%;display:flex;flex-direction:column}
-button,textarea,input{font-family:'Poppins',sans-serif}
-textarea{resize:none}
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--border-focus)}
-::selection{background:var(--accent);color:#0a0a0a}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--fg);font-family:'Poppins',sans-serif;font-size:14px;line-height:1.65;display:flex;flex-direction:column}
+textarea,input,button{font-family:'Poppins',sans-serif}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--b);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--bf)}
+::selection{background:var(--ac);color:#0a0a0a}
 
-/* ─── NAV ─── */
-.nav{background:rgba(10,10,10,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0;flex-shrink:0;z-index:100}
-.nav-inner{max-width:none;padding:0 24px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;height:52px;gap:20px}
-.nav-logo img{height:34px;width:auto;display:block}
-.nav-progress{display:flex;align-items:center;gap:14px}
-.nav-progress-bar{flex:1;height:2px;background:var(--surface-3);border-radius:1px;overflow:hidden;min-width:120px}
-.nav-progress-fill{height:100%;background:var(--accent);border-radius:1px;transition:width .4s var(--ease)}
-.nav-progress-label{font-family:var(--mono);font-size:11px;color:var(--fg-3);min-width:6ch;text-align:right;font-variant-numeric:tabular-nums}
-.nav-actions{display:flex;align-items:center;gap:8px}
-.btn{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:9px 18px;border-radius:2px;border:none;cursor:pointer;transition:all .2s var(--ease);display:inline-flex;align-items:center;gap:8px}
-.btn-primary{background:var(--accent);color:#0a0a0a}
-.btn-primary:hover{opacity:.88;transform:translateY(-1px)}
-.btn-outline{background:transparent;color:var(--fg-3);border:1px solid var(--border);font-size:11px}
-.btn-outline:hover{border-color:var(--border-focus);color:var(--fg)}
-.btn-danger{background:transparent;color:#888;border:1px solid var(--border);font-size:11px}
-.btn-danger:hover{border-color:var(--wrong);color:var(--wrong)}
-.saved-badge{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.1em;opacity:0;transition:opacity .3s;display:flex;align-items:center;gap:5px}
-.saved-badge.show{opacity:1}
-.saved-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent)}
+/* ── NAV ── */
+.nav{background:rgba(10,10,10,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--b);flex-shrink:0;height:52px;display:flex;align-items:center;padding:0 20px;gap:16px;position:relative;z-index:100}
+.nav-logo{flex-shrink:0}
+.nav-logo img{height:32px;width:auto;display:block}
+.nav-sep{width:1px;height:28px;background:var(--b);flex-shrink:0}
+.nav-progress{flex:1;display:flex;align-items:center;gap:12px;min-width:0}
+.nav-step-label{font-family:var(--mono);font-size:10px;color:var(--f4);letter-spacing:.12em;white-space:nowrap}
+.nav-bar{flex:1;height:2px;background:var(--s3);border-radius:1px;overflow:hidden;max-width:320px}
+.nav-bar-fill{height:100%;background:var(--ac);border-radius:1px;transition:width .5s var(--ease)}
+.nav-pct{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ac);min-width:3ch}
+.risk-badge{display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--rd);border:1px solid rgba(245,158,11,.3);border-radius:2px;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--risk);cursor:pointer;transition:all .2s;white-space:nowrap}
+.risk-badge:hover{background:rgba(245,158,11,.2)}
+.risk-badge.hidden{display:none}
+.risk-dot{width:5px;height:5px;border-radius:50%;background:var(--risk);animation:pulse-risk 2s ease-in-out infinite}
+@keyframes pulse-risk{0%,100%{opacity:1}50%{opacity:.4}}
+.nav-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.btn{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:8px 14px;border-radius:2px;border:none;cursor:pointer;transition:all .18s var(--ease);white-space:nowrap}
+.btn-green{background:var(--ac);color:#0a0a0a}
+.btn-green:hover{opacity:.88;transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--f3);border:1px solid var(--b)}
+.btn-ghost:hover{border-color:var(--bf);color:var(--fg)}
+.btn-reset{background:transparent;color:#666;border:1px solid var(--b)}
+.btn-reset:hover{border-color:var(--danger);color:var(--danger)}
+.saved-tag{font-family:var(--mono);font-size:10px;color:var(--ac);opacity:0;transition:opacity .3s;display:flex;align-items:center;gap:5px;letter-spacing:.08em}
+.saved-tag.show{opacity:1}
+.saved-tag::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--ac)}
 
-/* ─── SPLIT LAYOUT ─── */
-.split{display:grid;grid-template-columns:1fr 420px;flex:1;min-height:0;overflow:hidden}
+/* ── APP ── */
+.app{display:grid;grid-template-columns:192px 1fr 360px;flex:1;min-height:0;overflow:hidden}
 
-/* ─── LEFT — FORM PANEL ─── */
-.form-panel{overflow-y:auto;padding:0}
-.form-panel-inner{max-width:640px;margin:0 auto;padding:36px 36px 80px}
+/* ── SIDEBAR ── */
+.sidebar{border-right:1px solid var(--b);overflow-y:auto;padding:24px 0 40px;background:var(--bg)}
+.sidebar-header{padding:0 16px 16px;border-bottom:1px solid var(--b);margin-bottom:16px}
+.sidebar-title{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--f4)}
+.step-node-wrap{padding:0 0 0 16px}
+.step-node{display:flex;align-items:flex-start;gap:10px;padding:8px 12px 8px 0;cursor:pointer;border-radius:0 2px 2px 0;border-left:2px solid transparent;transition:all .18s;position:relative}
+.step-node.active{border-left-color:var(--ac);background:rgba(0,255,148,.04)}
+.step-node.locked{opacity:.45;cursor:not-allowed}
+.step-node:not(.locked):not(.active):hover{background:rgba(255,255,255,.03);border-left-color:var(--b)}
+.node-via{width:20px;height:20px;min-width:20px;border-radius:50%;border:1.5px solid var(--b);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;font-weight:700;color:var(--f4);transition:all .2s;flex-shrink:0;margin-top:1px}
+.step-node.active .node-via{border-color:var(--ac);color:var(--ac);box-shadow:0 0 8px rgba(0,255,148,.25)}
+.step-node.done .node-via{background:var(--ac);border-color:var(--ac);color:#0a0a0a}
+.step-node.locked .node-via{border-color:#444;color:#444}
+.node-info{flex:1;min-width:0}
+.node-label{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--f4);margin-bottom:2px}
+.step-node.active .node-label{color:var(--ac)}
+.node-title{font-size:12px;font-weight:600;color:var(--fg);line-height:1.3;margin-bottom:5px}
+.step-node.locked .node-title{color:#666}
+.node-heat{display:flex;gap:2px;flex-wrap:wrap}
+.heat-dot{width:7px;height:7px;border-radius:1px;background:var(--s3);transition:background .3s}
+.heat-dot.empty{background:var(--s3)}
+.heat-dot.partial{background:var(--risk)}
+.heat-dot.good{background:var(--info)}
+.heat-dot.done{background:var(--ac)}
+.node-lock-icon{font-size:11px;color:#444;margin-top:2px}
+.trace-line{width:1.5px;height:16px;background:var(--b);margin:0 0 0 25px;transition:background .3s}
+.trace-line.done{background:var(--ac)}
 
-/* ─── STEP HEADER ─── */
-.step-block{margin-bottom:48px}
-.step-block:last-child{margin-bottom:0}
-.step-tag{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.step-tag::before{content:'';width:20px;height:1px;background:var(--accent)}
-.step-title{font-size:22px;font-weight:700;letter-spacing:-.025em;line-height:1.25;margin-bottom:6px}
-.step-desc{font-size:13px;color:var(--fg-3);line-height:1.65;margin-bottom:24px;max-width:52ch}
+/* ── FORM AREA ── */
+.form-area{overflow-y:auto;min-width:0}
+.form-inner{max-width:680px;margin:0 auto;padding:36px 40px 100px}
 
-/* ─── QUESTION CARD ─── */
-.q-card{background:var(--surface);border:1px solid var(--border);margin-bottom:12px;transition:border-color .2s}
-.q-card:focus-within{border-color:var(--border-focus)}
-.q-card-header{padding:16px 20px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-.q-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--accent);letter-spacing:.1em;flex-shrink:0;padding-top:3px}
-.q-title{font-size:14px;font-weight:600;color:var(--fg);line-height:1.4;flex:1}
+/* ── STEP PANEL ── */
+.step-panel{display:none}
+.step-panel.active{display:block}
+.step-head{margin-bottom:32px}
+.step-kicker{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ac);display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.step-kicker::before{content:'';width:20px;height:1px;background:var(--ac)}
+.step-title{font-size:24px;font-weight:700;letter-spacing:-.025em;line-height:1.2;margin-bottom:6px}
+.step-desc{font-size:13px;color:var(--f3);line-height:1.65;max-width:54ch}
+.step-pips{display:flex;gap:3px;margin-top:16px}
+.s-pip{height:2px;flex:1;background:var(--s3);border-radius:1px;transition:background .35s}
+.s-pip.partial{background:var(--risk)}
+.s-pip.done{background:var(--ac)}
+
+/* ── QUESTION CARD ── */
+.q-card{background:var(--s);border:1px solid var(--b);border-left:3px solid var(--b);margin-bottom:10px;transition:border-color .25s,border-left-color .25s}
+.q-card:focus-within{border-color:var(--bf)}
+.q-card[data-conf="low"]{border-left-color:var(--risk)}
+.q-card[data-conf="mid"]{border-left-color:var(--info)}
+.q-card[data-conf="high"]{border-left-color:var(--ac)}
+.q-top{padding:14px 16px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.q-id{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--ac);letter-spacing:.12em;flex-shrink:0;padding-top:3px}
+.q-title{font-size:13px;font-weight:600;color:var(--fg);line-height:1.4;flex:1}
 .q-stars{display:flex;gap:3px;flex-shrink:0}
-.star{width:18px;height:18px;cursor:pointer;transition:transform .12s,color .12s;color:var(--star-off)}
-.star:hover,
-.star-hover{color:var(--accent);transform:scale(1.2)}
-.star.lit{color:var(--accent)}
-.star svg{width:100%;height:100%;display:block}
-.q-guide{padding:6px 20px 10px;font-size:12px;color:var(--fg-3);line-height:1.55}
-.q-answer{padding:0 20px 16px}
-.q-answer textarea{
-  width:100%;background:var(--surface-2);
-  border:1px solid var(--border);
-  border-radius:2px;color:var(--fg);
-  font-size:13px;padding:10px 12px;
-  min-height:72px;outline:none;line-height:1.6;
-  transition:border-color .2s,background .2s;
-}
-.q-answer textarea::placeholder{color:#666;font-style:italic}
-.q-answer textarea:focus{border-color:var(--accent);background:var(--surface-3)}
-.q-answer textarea.has-content{border-color:var(--border-focus)}
-.q-footer{padding:0 20px 14px;display:flex;align-items:center;justify-content:space-between}
-.q-confidence-label{font-family:var(--mono);font-size:10px;color:#666;letter-spacing:.08em}
-.q-confidence-label.rated{color:var(--fg-3)}
-.q-wordcount{font-family:var(--mono);font-size:10px;color:#555;letter-spacing:.05em}
+.star{width:16px;height:16px;cursor:pointer;color:var(--star);transition:color .12s,transform .12s;display:block}
+.star:hover,.star.hover-on{color:var(--ac);transform:scale(1.25)}
+.star.lit{color:var(--ac)}
+.star svg{width:100%;height:100%;display:block;pointer-events:none}
+.q-guide{padding:5px 16px 10px;font-size:11.5px;color:var(--f3);line-height:1.6;border-bottom:1px solid var(--s3)}
+.q-guide em{color:var(--f4);font-style:normal}
+.q-body{padding:10px 16px}
+.q-textarea{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:2px;color:var(--fg);font-size:12.5px;padding:9px 11px;min-height:68px;outline:none;line-height:1.65;resize:vertical;transition:border-color .2s,background .2s}
+.q-textarea::placeholder{color:#555;font-style:italic}
+.q-textarea:focus{border-color:var(--ac);background:var(--s3)}
+.q-textarea.has-value{border-color:var(--bf)}
+.q-foot{padding:6px 16px 12px;display:flex;align-items:center;justify-content:space-between}
+.q-conf-label{font-family:var(--mono);font-size:10px;color:#555;letter-spacing:.06em;transition:color .2s}
+.q-conf-label.rated{color:var(--f4)}
+.q-wc{font-family:var(--mono);font-size:10px;color:#444;letter-spacing:.04em}
 
-/* ─── STEP PROGRESS BAR ─── */
-.step-progress{display:flex;gap:4px;margin-bottom:20px}
-.step-pip{height:3px;flex:1;background:var(--surface-3);border-radius:2px;transition:background .3s}
-.step-pip.done{background:var(--accent)}
-.step-pip.partial{background:rgba(0,255,148,.4)}
+/* ── GATE ── */
+.gate{margin-top:32px;padding:24px;background:var(--s);border:1px solid var(--b);position:relative;overflow:hidden}
+.gate::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--ac),transparent)}
+.gate-title{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ac);margin-bottom:6px}
+.gate-sub{font-size:12px;color:var(--f3);margin-bottom:18px;line-height:1.55}
+.gate-checks{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.gate-item{display:flex;align-items:flex-start;gap:10px;cursor:pointer}
+.gate-box{width:16px;height:16px;min-width:16px;border:1.5px solid var(--bf);border-radius:2px;display:flex;align-items:center;justify-content:center;transition:all .18s;margin-top:2px;background:transparent}
+.gate-box.checked{background:var(--ac);border-color:var(--ac)}
+.gate-box.checked::after{content:'';width:4px;height:7px;border:2px solid #0a0a0a;border-top:none;border-left:none;transform:rotate(45deg);margin-top:-1px;display:block}
+.gate-item-text{font-size:12.5px;color:var(--f2);line-height:1.5}
+.gate-btn{display:flex;align-items:center;gap:8px;background:var(--ad);border:1px solid rgba(0,255,148,.3);color:var(--ac);font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:11px 18px;cursor:pointer;transition:all .2s;width:100%;justify-content:center}
+.gate-btn:hover:not(:disabled){background:var(--am);transform:translateY(-1px)}
+.gate-btn:disabled{opacity:.35;cursor:not-allowed}
+.gate-btn.passed{background:var(--ac);color:#0a0a0a;border-color:var(--ac)}
+.gate-passed-note{text-align:center;font-family:var(--mono);font-size:10px;color:var(--ac);letter-spacing:.1em;padding:12px;border:1px solid rgba(0,255,148,.2);background:rgba(0,255,148,.05)}
 
-/* ─── RIGHT — BRIEF PREVIEW ─── */
-.preview-panel{border-left:1px solid var(--border);overflow-y:auto;background:var(--surface);display:flex;flex-direction:column}
-.preview-header{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;background:var(--surface);z-index:10}
-.preview-title{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--fg-3)}
-.preview-actions{display:flex;gap:6px}
-.preview-inner{padding:24px;flex:1}
-.brief-doc{font-size:12px;line-height:1.75;color:var(--fg-2)}
-.brief-masthead{border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:20px}
-.brief-logo{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
-.brief-h1{font-size:17px;font-weight:700;letter-spacing:-.02em;color:var(--fg);margin-bottom:4px}
-.brief-meta{font-family:var(--mono);font-size:10px;color:#666;letter-spacing:.06em}
-.brief-section{margin-bottom:20px}
-.brief-section-title{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
-.brief-item{padding:8px 0;border-bottom:1px solid var(--surface-3)}
+/* ── RIGHT PANEL ── */
+.right-panel{border-left:1px solid var(--b);display:flex;flex-direction:column;background:var(--s);min-height:0}
+.rp-tabs{display:flex;border-bottom:1px solid var(--b);flex-shrink:0}
+.rp-tab{flex:1;padding:13px 16px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--f4);background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .18s;text-align:center}
+.rp-tab.active{color:var(--ac);border-bottom-color:var(--ac);background:rgba(0,255,148,.03)}
+.rp-tab:hover:not(.active){color:var(--fg)}
+.rp-body{flex:1;overflow-y:auto;padding:20px}
+
+/* ── BRIEF ── */
+.brief-masthead{border-bottom:1px solid var(--b);padding-bottom:14px;margin-bottom:18px}
+.brief-brand{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--ac);margin-bottom:6px}
+.brief-h1{font-size:16px;font-weight:700;letter-spacing:-.02em;color:var(--fg);margin-bottom:3px}
+.brief-meta{font-family:var(--mono);font-size:10px;color:#555;letter-spacing:.06em}
+.brief-comp{margin:12px 0 18px}
+.brief-comp-label{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--f4);margin-bottom:6px}
+.brief-comp-bar{height:2px;background:var(--s3);margin-bottom:4px}
+.brief-comp-fill{height:100%;background:var(--ac);transition:width .5s var(--ease)}
+.brief-comp-pct{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ac)}
+.brief-section{margin-bottom:18px}
+.brief-section-title{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--ac);border-bottom:1px solid var(--b);padding-bottom:7px;margin-bottom:10px}
+.brief-item{padding:7px 0;border-bottom:1px solid var(--s3)}
 .brief-item:last-child{border-bottom:none}
-.brief-item-q{font-size:11px;font-weight:600;color:var(--fg-3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em;font-family:var(--mono)}
-.brief-item-a{font-size:12px;color:var(--fg);line-height:1.6}
-.brief-item-a.empty{color:#555;font-style:italic}
-.brief-stars{display:flex;gap:2px;margin-top:3px}
-.brief-star{font-size:9px;color:var(--accent)}
-.brief-star.off{color:var(--surface-3)}
-.brief-completeness{margin-top:16px;padding:12px;background:var(--surface-2);border:1px solid var(--border)}
-.brief-comp-label{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-3);margin-bottom:8px}
-.brief-comp-bar{height:2px;background:var(--surface-3);margin-bottom:6px}
-.brief-comp-fill{height:100%;background:var(--accent);transition:width .5s var(--ease)}
-.brief-comp-pct{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent)}
+.brief-q{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--f4);margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.brief-a{font-size:11.5px;color:var(--f2);line-height:1.6;white-space:pre-wrap}
+.brief-a.empty{color:#444;font-style:italic}
+.brief-stars{display:inline-flex;gap:2px;margin-left:4px}
+.brief-star{font-size:8px;color:var(--ac)}
+.brief-star.off{color:var(--s3)}
+.brief-empty{padding:40px 20px;text-align:center;color:#444}
+.brief-empty-icon{font-size:28px;margin-bottom:10px;opacity:.4}
+.brief-empty-text{font-size:12px;line-height:1.6;color:#555}
 
-/* ─── EMPTY STATE ─── */
-.preview-empty{padding:40px 24px;text-align:center;color:#555}
-.preview-empty-icon{font-size:32px;margin-bottom:12px;opacity:.4}
-.preview-empty-text{font-size:13px;line-height:1.6}
+/* ── RISK PANEL ── */
+.risk-header{margin-bottom:16px}
+.risk-header-title{font-size:14px;font-weight:700;letter-spacing:-.01em;margin-bottom:3px}
+.risk-header-sub{font-size:11px;color:var(--f4);line-height:1.5}
+.risk-item{padding:12px;background:var(--s2);border:1px solid var(--b);border-left:3px solid var(--risk);margin-bottom:8px}
+.risk-item.critical{border-left-color:var(--danger)}
+.risk-item.medium{border-left-color:var(--risk)}
+.risk-badge-label{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--risk);margin-bottom:4px}
+.risk-item.critical .risk-badge-label{color:var(--danger)}
+.risk-item-q{font-size:11.5px;font-weight:600;color:var(--fg);margin-bottom:3px}
+.risk-item-a{font-size:11px;color:var(--f3);line-height:1.5}
+.risk-item-stars{font-family:var(--mono);font-size:10px;color:var(--f4);margin-top:4px}
+.risk-empty{padding:30px 16px;text-align:center;color:#555;font-size:12px;line-height:1.65}
 
-/* ─── MODAL ─── */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
 .overlay.open{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);max-width:400px;width:100%;padding:28px}
-.modal h2{font-size:17px;font-weight:700;margin-bottom:8px}
-.modal p{font-size:13px;color:var(--fg-3);line-height:1.6;margin-bottom:20px}
-.modal-actions{display:flex;gap:8px}
+.modal{background:var(--s);border:1px solid var(--b);max-width:400px;width:100%;padding:28px}
+.modal h2{font-size:17px;font-weight:700;letter-spacing:-.02em;margin-bottom:8px}
+.modal p{font-size:13px;color:var(--f3);line-height:1.6;margin-bottom:20px}
+.modal-btns{display:flex;gap:8px}
 
-/* ─── PRINT / PDF ─── */
+/* ── PRINT ── */
 @media print{
-  body{overflow:visible;background:#fff;color:#000;font-size:11pt}
-  .nav,.preview-panel,.overlay{display:none!important}
-  .split{display:block;overflow:visible}
-  .form-panel{overflow:visible}
-  .form-panel-inner{max-width:none;padding:0}
-  .step-block{page-break-inside:avoid;margin-bottom:32pt}
-  .step-tag{color:#00aa66;font-size:8pt}
-  .step-title{font-size:16pt;color:#000}
-  .step-desc{color:#444;font-size:9pt}
-  .step-progress{display:none}
-  .q-card{border:1pt solid #ccc;background:#fff;margin-bottom:8pt;page-break-inside:avoid}
-  .q-num{color:#00aa66}
+  html,body{height:auto;overflow:visible}
+  .nav,.sidebar,.right-panel,.gate,.step-panel:not(.active) .step-pips{display:none!important}
+  .app{display:block}
+  .form-area{overflow:visible}
+  .form-inner{max-width:none;padding:0}
+  .step-panel{display:block!important}
+  .step-head{page-break-after:avoid}
+  .q-card{page-break-inside:avoid;border:1pt solid #ccc;background:#fff;margin-bottom:8pt}
   .q-title{color:#000}
-  .q-guide{color:#666;font-size:8pt}
-  .q-answer textarea{border:none;background:transparent;color:#000;font-size:10pt;min-height:auto;padding:4pt 0}
-  .q-stars .star{color:#ccc}
-  .q-stars .star.lit{color:#00aa66}
-  .q-footer{border-top:0.5pt solid #eee;padding-top:4pt}
-  .q-confidence-label{color:#888;font-size:8pt}
-  .q-wordcount{display:none}
+  .q-guide{color:#555;border-bottom-color:#eee}
+  .q-textarea{border:none;background:transparent;color:#000;min-height:0;font-size:10pt}
+  .q-foot{border-top:0.5pt solid #eee}
+  .q-conf-label,.q-wc{color:#888;font-size:8pt}
+  .star{color:#ccc}
+  .star.lit{color:#00aa66}
+  body{background:#fff;color:#000;font-size:10pt}
 }
 
-/* ─── MOBILE ─── */
+/* ── MOBILE ── */
 @media(max-width:900px){
-  body{overflow:auto}
-  .split{grid-template-columns:1fr;overflow:visible}
-  .preview-panel{display:none}
-  .form-panel{overflow:visible}
-  .form-panel-inner{padding:24px 20px 60px}
-  .nav-inner{padding:0 16px;grid-template-columns:auto 1fr auto}
-  .nav-progress{display:none}
-}
-@media(max-width:480px){
-  .nav-actions .btn-outline,.nav-actions .btn-danger{display:none}
+  html,body{height:auto;overflow:auto}
+  .app{grid-template-columns:1fr;overflow:visible}
+  .sidebar,.right-panel{display:none}
+  .form-area{overflow:visible}
+  .form-inner{padding:24px 20px 60px}
+  .nav{flex-wrap:wrap;height:auto;padding:10px 16px;gap:8px}
+  .nav-sep{display:none}
 }
 </style>
 </head>
@@ -192,45 +239,47 @@ textarea{resize:none}
 
 <!-- NAV -->
 <nav class="nav">
-  <div class="nav-inner">
+  <div class="nav-logo">
     <a href="https://www.fresuelectronics.com">
-      <img src="https://raw.githubusercontent.com/dariofresu/Fresu-Electronics-Blog/main/assets/logo.png" alt="Fresu Electronics" style="height:34px;width:auto">
+      <img src="https://raw.githubusercontent.com/dariofresu/Fresu-Electronics-Blog/main/assets/logo.png" alt="Fresu Electronics" style="height:32px;width:auto">
     </a>
-    <div class="nav-progress">
-      <div class="nav-progress-bar"><div class="nav-progress-fill" id="nav-fill" style="width:0%"></div></div>
-      <span class="nav-progress-label" id="nav-label">0 / 20</span>
-      <span class="saved-badge" id="saved-badge">Saved</span>
-    </div>
-    <div class="nav-actions">
-      <button class="btn btn-primary" onclick="window.print()">Export PDF ↓</button>
-      <button class="btn btn-outline" onclick="downloadTool()">Save Offline</button>
-      <button class="btn btn-danger" onclick="showReset()">Reset</button>
-    </div>
+  </div>
+  <div class="nav-sep"></div>
+  <div class="nav-progress">
+    <span class="nav-step-label" id="nav-step-label">Step 1 of 5</span>
+    <div class="nav-bar"><div class="nav-bar-fill" id="nav-bar-fill" style="width:0%"></div></div>
+    <span class="nav-pct" id="nav-pct">0%</span>
+    <span class="saved-tag" id="saved-tag">Saved</span>
+  </div>
+  <div id="risk-badge" class="risk-badge hidden">
+    <span class="risk-dot"></span>
+    <span id="risk-count">0</span>&nbsp;Risks
+  </div>
+  <div class="nav-actions">
+    <button class="btn btn-green" onclick="window.print()">Export PDF</button>
+    <button class="btn btn-ghost" onclick="downloadTool()">Save Offline</button>
+    <button class="btn btn-reset" onclick="showReset()">Reset</button>
   </div>
 </nav>
 
-<!-- SPLIT -->
-<div class="split">
+<!-- APP -->
+<div class="app">
 
-  <!-- FORM PANEL -->
-  <div class="form-panel" id="form-panel">
-    <div class="form-panel-inner" id="form-inner"></div>
-  </div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar"></aside>
 
-  <!-- PREVIEW PANEL -->
-  <div class="preview-panel">
-    <div class="preview-header">
-      <span class="preview-title">Live Brief Preview</span>
-      <div class="preview-actions">
-        <button class="btn btn-outline" style="font-size:10px" onclick="exportBrief()">Export HTML ↓</button>
-      </div>
+  <!-- FORM -->
+  <main class="form-area">
+    <div class="form-inner" id="form-inner"></div>
+  </main>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="rp-tabs">
+      <button class="rp-tab active" id="tab-brief" onclick="switchTab('brief')">Live Brief</button>
+      <button class="rp-tab" id="tab-risks" onclick="switchTab('risks')">Risk Register</button>
     </div>
-    <div class="preview-inner" id="preview-inner">
-      <div class="preview-empty">
-        <div class="preview-empty-icon">📄</div>
-        <div class="preview-empty-text">Start answering questions on the left.<br>Your brief builds here in real time.</div>
-      </div>
-    </div>
+    <div class="rp-body" id="rp-body"></div>
   </div>
 
 </div>
@@ -238,364 +287,606 @@ textarea{resize:none}
 <!-- RESET MODAL -->
 <div class="overlay" id="overlay">
   <div class="modal">
-    <h2>Reset all answers?</h2>
-    <p>This clears every answer, confidence rating, and resets progress. Previously exported briefs are not affected.</p>
-    <div class="modal-actions">
-      <button class="btn btn-primary" style="background:var(--wrong)" onclick="confirmReset()">Yes, reset</button>
-      <button class="btn btn-outline" onclick="hideReset()">Cancel</button>
+    <h2>Reset everything?</h2>
+    <p>Clears all answers, confidence ratings, and gate progress. Previously exported PDFs are not affected.</p>
+    <div class="modal-btns">
+      <button class="btn" style="background:var(--danger);color:#fff" onclick="confirmReset()">Yes, reset</button>
+      <button class="btn btn-ghost" onclick="hideReset()">Cancel</button>
     </div>
   </div>
 </div>
 
 <script>
-// ─── DATA ───────────────────────────────────────────────────────────────────
-const STEPS = [
+// ─── DATA ────────────────────────────────────────────────────────────────────
+
+var STEPS = [
   {
-    id: 's1',
-    tag: 'Step 01 of 04',
-    title: 'Product Vision',
-    desc: 'Who is this for, what problem does it solve, and why now? Engineers who can\'t answer these clearly build the wrong thing faster.',
+    id: 's1', n: '01', title: 'Product Vision',
+    desc: 'Who is this for, what problem does it solve, and why now? Engineers who cannot answer these clearly build the wrong thing faster.',
     questions: [
-      { id: 'q01', title: 'Problem statement', guide: 'What specific problem does this product solve? State it in one sentence — no technical jargon. If you need two sentences, the problem isn\'t clear yet.' },
-      { id: 'q02', title: 'Target user', guide: 'Who uses this? Role, industry, context of use. Not "engineers" — be specific. "A mechanical engineer at a Tier-1 automotive supplier designing battery management systems."' },
-      { id: 'q03', title: 'Market opportunity', guide: 'Why is now the right time? What trend, regulatory change, or gap makes this viable today that wasn\'t viable 2 years ago?' },
-      { id: 'q04', title: 'Success criteria', guide: 'How will you know this product succeeded in 12 months? Name 2–3 measurable outcomes — not "it works," but actual metrics.' },
-      { id: 'q05', title: 'Competitive advantage', guide: 'What makes this distinctly better or different from existing solutions? One clear, honest differentiator beats a list of vague ones.' },
+      { id: 'q01', title: 'Problem statement', guide: 'State the problem in one sentence — no technical jargon. If you need two sentences, the problem is not yet clear. Test: can a non-engineer understand it in 30 seconds?' },
+      { id: 'q02', title: 'Target user', guide: 'Not "engineers". Be specific: role, industry, company size, context of use. E.g.: "A hardware lead at a Tier-1 automotive supplier designing ADAS control units for ISO 26262 ASIL-B compliance."' },
+      { id: 'q03', title: 'Market timing', guide: 'Why is now the right moment? What regulation, technology shift, or market gap makes this viable today that did not exist 18 months ago?' },
+      { id: 'q04', title: 'Success criteria (12 months)', guide: 'Name 2–3 measurable outcomes. Not "it works" — actual numbers. Revenue, units shipped, certification achieved, customer signed.' },
+      { id: 'q05', title: 'Competitive differentiation', guide: 'One clear, honest differentiator over existing alternatives. A list of vague advantages is not differentiation. What would make a target user switch?' },
+    ],
+    gate: [
+      'I can explain this product\'s value in one sentence to a non-engineer',
+      'A named person owns the product vision and all scope decisions',
+      'The target user is specific enough that I could name three real people who fit the description'
     ]
   },
   {
-    id: 's2',
-    tag: 'Step 02 of 04',
-    title: 'Technical Requirements',
-    desc: 'Every vague requirement here becomes a costly rework later. Numbers beat adjectives — "fast" means nothing, "< 5 ms latency" does.',
+    id: 's2', n: '02', title: 'Technical Requirements',
+    desc: 'Every vague requirement here becomes a costly rework later. Numbers beat adjectives — "fast" means nothing, "< 5 ms at 85°C" does.',
     questions: [
-      { id: 'q06', title: 'Performance specifications', guide: 'Key metrics with target values and tolerances: speed, accuracy, range, resolution, throughput, latency, sample rate. Include the condition under which each is measured.' },
-      { id: 'q07', title: 'Power budget', guide: 'Supply voltage(s), max current draw, efficiency target. If battery-powered: capacity (mAh/Wh), target run time, and acceptable charge time. If mains: input range, power factor requirement.' },
-      { id: 'q08', title: 'Environmental conditions', guide: 'Operating temperature range (°C), storage temperature, humidity (% RH), altitude, vibration profile, shock, IP rating. Note which are hard requirements vs. targets.' },
-      { id: 'q09', title: 'Form factor & mechanical', guide: 'PCB max dimensions (mm), enclosure type (closed/open/DIN rail/panel mount), connector face locations, mounting holes, any keep-out zones, height constraints.' },
-      { id: 'q10', title: 'Unit cost target', guide: 'Target BOM cost at volume (1k / 10k / 100k units). Identify the top 3 cost drivers. Flag any components with >30% BOM cost contribution — these drive architectural decisions.' },
-      { id: 'q11', title: 'Reliability & lifetime', guide: 'Expected product operating lifetime (hours or years), MTBF target if applicable, key failure modes to design against, warranty period. State the mission profile.' },
+      { id: 'q06', title: 'Performance specs + test methods', guide: 'For each spec: [Parameter] [Value] [Tolerance] [Test method] [Pass/fail criterion]. A spec without a test method is a wish, not a requirement.' },
+      { id: 'q07', title: 'Power budget', guide: 'Each supply rail: voltage, max current draw, efficiency target. If battery-powered: capacity (Wh), run time target, acceptable charge time. Identify the dominant power consumers.' },
+      { id: 'q08', title: 'Power architecture', guide: 'Rail names, voltage domains, power sequencing order, inrush management approach, PDN impedance targets at key frequencies. These drive layout before the schematic starts.' },
+      { id: 'q09', title: 'Thermal budget', guide: 'Power dissipation per key IC. Junction temperature limits (Tj max). Thermal resistance targets (RθJA, RθJC). Cooling strategy: natural convection, forced air, heatsink, TIM. Operating derating curve.' },
+      { id: 'q10', title: 'Environmental conditions', guide: 'Operating temp range (°C), storage temp, humidity (% RH non-condensing), altitude (m), vibration profile (G, Hz), shock, IP rating. Flag which are contractual vs. target.' },
+      { id: 'q11', title: 'Form factor & mechanical', guide: 'PCB max dimensions (mm), enclosure type, connector face locations, mounting hole pattern, max component height, any keep-out zones or weight limits.' },
+      { id: 'q12', title: 'Unit cost target', guide: 'Target BOM cost at 1k / 10k / 100k units. Top 3 cost drivers. Flag any component with >25% of total BOM cost — these make or break the business case.' },
+      { id: 'q13', title: 'Reliability & lifetime', guide: 'Product operating lifetime (hours or years). MTBF target if specified. Mission profile. Warranty period. Key failure modes to design against — not just "don\'t break".' },
+    ],
+    gate: [
+      'Every performance specification has a defined test method and pass/fail criterion',
+      'Thermal dissipation has been validated against the cooling strategy (not estimated)',
+      'Power architecture is defined at rail level — schematic capture can start without open questions'
     ]
   },
   {
-    id: 's3',
-    tag: 'Step 03 of 04',
-    title: 'Architecture & Interfaces',
-    desc: 'Define what connects to what before you assign a single footprint. The block diagram is the design — everything else is implementation detail.',
+    id: 's3', n: '03', title: 'EMC by Design',
+    desc: 'EMC is not a compliance checkbox at the end — it is a set of design constraints defined here, applied in layout. Retrofitting EMC costs 3× more than designing for it.',
     questions: [
-      { id: 'q12', title: 'Top-level block diagram', guide: 'Describe the major functional blocks and their interconnections. If you can\'t describe it in text, sketch it and describe what you sketched. Identify the critical signal paths.' },
-      { id: 'q13', title: 'Key component candidates', guide: 'MCU/processor/FPGA, power management ICs, key sensors or actuators, memory, communication ICs. Initial candidates with part numbers if known. Flag single-source risks.' },
-      { id: 'q14', title: 'External interfaces & connectors', guide: 'List every I/O connector and protocol: USB (which version/class), Ethernet (speed), CAN, RS-485, SPI, I²C, UART, analog inputs/outputs, RF, GPIO. Include signal levels and max cable length.' },
-      { id: 'q15', title: 'High-speed & signal-integrity critical nets', guide: 'Which signals will drive PCB layout decisions? DDR, PCIe, USB HS, LVDS, clock distribution, high-current switching nodes. Note required impedance (e.g. 50 Ω, 100 Ω diff).' },
-      { id: 'q16', title: 'PCB stack-up & layer count', guide: 'Estimated layer count and rationale. Controlled impedance requirements. Any shielding layer needs. EMI-sensitive areas. Minimum trace/space if constrained by cost or fab capability.' },
+      { id: 'q14', title: 'Primary emission sources', guide: 'Which interfaces and switching nodes are the dominant emission sources? List by interface. E.g.: "Switching node on U3 buck converter (400 kHz), USB 3.0 differential pairs, 100 MHz system clock distribution."' },
+      { id: 'q15', title: 'Stack-up & EMC layer assignment', guide: 'Layer count rationale, signal-to-RRP pairing for each layer, EMI-critical layer assignments, dielectric thickness targets between signal and adjacent RRP. Reference Fresu\'s layer-pairing rules.' },
+      { id: 'q16', title: 'Filtering strategy per interface', guide: 'For each external connector: filter type (CM choke, LC, RC, TVS), placement rule (distance from connector), insertion loss requirement. Who selected these components — and when?' },
+      { id: 'q17', title: 'Shielding strategy', guide: 'Enclosure shielding material and expected attenuation. Board-level shields (which sections, which frequencies). Cable shielding: shield grounding strategy at both ends. Any near-field shields on switching nodes?' },
+      { id: 'q18', title: 'Return path architecture', guide: 'RRP continuity plan: no splits across signal layers, stitching via placement and density, void strategy under connectors. Where are the highest-risk return path discontinuities and how are they mitigated?' },
+      { id: 'q19', title: 'Pre-compliance test plan', guide: 'Target standards (EN 55032 class B, FCC Part 15B, etc.). Pre-compliance lab: internal or external? Scheduled relative to which milestone (layout freeze, first article)? Who owns the action items from pre-comp results?' },
+    ],
+    gate: [
+      'EMC has been architected at the interface and stack-up level — not deferred to the layout phase',
+      'Every external interface has a defined filter and protection strategy with component candidates',
+      'Pre-compliance testing is scheduled before layout freeze'
     ]
   },
   {
-    id: 's4',
-    tag: 'Step 04 of 04',
-    title: 'Compliance & Risk',
-    desc: 'Decide which certifications you\'re targeting before the first trace is placed. Retrofitting compliance costs 3× more than designing for it from the start.',
+    id: 's4', n: '04', title: 'Architecture & Interfaces',
+    desc: 'Define what connects to what before assigning footprints. The block diagram is the design — everything else is implementation detail.',
     questions: [
-      { id: 'q17', title: 'Target certifications', guide: 'FCC Part 15 / CE (EMC + LVD + RED) / UKCA / UL 62368-1 / RoHS / REACH / automotive (AEC-Q, IATF 16949) / medical (IEC 60601-1) / industrial (IEC 61010). State the specific standards, not just regions.' },
-      { id: 'q18', title: 'EMC strategy', guide: 'EMI control approach at architecture level: filtering strategy at I/O, shielding plan (enclosure vs PCB), PCB-level mitigation (stack-up, layer assignment, return path planning). Who owns the EMC review — internal or external?' },
-      { id: 'q19', title: 'Supply chain risk', guide: 'Long-lead components (>16 weeks lead time), single-source ICs, components under export control, components at end-of-life. Are there qualified second-sources for the top 5 BOM items by cost?' },
-      { id: 'q20', title: 'Development timeline', guide: 'Key milestones with target dates: schematic complete, layout complete, first article build, DVT, EMC pre-compliance, formal compliance testing, production release. Which milestones are externally committed?' },
+      { id: 'q20', title: 'Top-level block diagram', guide: 'Describe all major functional blocks and their signal flow. Identify the critical paths — the ones that, if wrong, invalidate the design. Attach the diagram reference or describe it in enough detail to reconstruct it.' },
+      { id: 'q21', title: 'Key component candidates', guide: 'MCU/processor/FPGA, power management ICs, key sensors, memory, RF or comms ICs. Include part numbers where known. Flag single-source components and known long-lead-time parts.' },
+      { id: 'q22', title: 'External interfaces & connectors', guide: 'Every I/O connector and protocol with: electrical level (3.3V LVTTL, CML, etc.), max cable length, connector type and mating. Note which are customer-facing vs. internal vs. manufacturing interfaces.' },
+      { id: 'q23', title: 'Signal integrity critical nets', guide: 'Every net requiring controlled impedance: target Ω, topology (point-to-point, daisy-chain, fly-by), max trace length, return loss budget. Include DDR, PCIe, USB, Ethernet, LVDS, clock distribution.' },
+      { id: 'q24', title: 'DFM constraints', guide: 'Fab capability class, min trace/space (mm), min via drill, blind/buried via requirements, IPC class (2 or 3), CM name and their specific process limits. Surface finish and soldermask requirements.' },
+      { id: 'q25', title: 'DFT strategy', guide: 'Test coverage target (%). Test method: ICT, flying probe, functional, or combination. Test point density and accessibility rule. Boundary scan / JTAG coverage. Who defines the test plan — and when?' },
+      { id: 'q26', title: 'Debug & bring-up interfaces', guide: 'JTAG/SWD headers, UART debug console, custom debug bus. Connector type (always-on vs. test point only). Firmware programming interface. First-power-on verification sequence defined?' },
+    ],
+    gate: [
+      'The block diagram has been formally reviewed and signed off by the full team',
+      'A DFM review with the contract manufacturer is scheduled before layout starts',
+      'Every high-speed interface has a defined impedance target, topology, and max length constraint'
+    ]
+  },
+  {
+    id: 's5', n: '05', title: 'Compliance & Risk',
+    desc: 'A spec without a risk register is optimism masquerading as engineering. Every open assumption is a risk. Name them now.',
+    questions: [
+      { id: 'q27', title: 'Target certifications', guide: 'Specific standards only — not regions. E.g.: EN 55032 Class B, EN 61000-4-2 Level 2, FCC Part 15B, UL 62368-1, IEC 60601-1 3rd ed., ISO 26262 ASIL-B. Include Annex references where applicable.' },
+      { id: 'q28', title: 'Assumptions log', guide: 'List every design assumption that, if wrong, requires revisiting this spec. E.g.: "Assume 8-layer board is within budget", "Assume CM can achieve 3/3 mil trace/space". Each assumption should have an owner and a verification date.' },
+      { id: 'q29', title: 'Technical risk register', guide: 'For each risk: description, likelihood (L/M/H), impact (L/M/H), owner, mitigation action, and target resolution date. Low-confidence answers from earlier steps should appear here as risks.' },
+      { id: 'q30', title: 'Supply chain risk', guide: 'Parts with >16 week lead time. Single-source ICs with no qualified second-source. Components at end-of-life or under export control. Geographic concentration risk. Mitigation: buffer stock, alternates, design-in flexibility.' },
+      { id: 'q31', title: 'Accountability matrix', guide: 'Named owners for: technical direction, EMC compliance, cost, schedule, production readiness, customer acceptance. Who has authority to change scope? Who signs off before layout starts?' },
+      { id: 'q32', title: 'Review milestones', guide: 'Formal review checkpoints with target dates: spec sign-off, schematic review, layout review, DVT entry, pre-compliance, formal certification, production release. Who chairs each review?' },
+    ],
+    gate: [
+      'Every identified risk has a named owner and a mitigation plan with a target date',
+      'This specification is version-controlled with a change log — not just a shared document',
+      'A formal sign-off process is defined and agreed before schematic capture begins'
     ]
   }
 ];
 
-const TOTAL_Q = STEPS.reduce((n, s) => n + s.questions.length, 0);
-const STORAGE_KEY = 'fresu_hwspec_v3';
-let state = {};
+var CONF_LABELS = ['', 'Low', 'Fair', 'Good', 'High', 'Locked'];
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+
+var KEY = 'fresu_hwspec_v3';
+var state = { answers: {}, stars: {}, gates: {}, activeStep: 's1', activeTab: 'brief' };
 
 function loadState() {
-  try { state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
-  catch(e) { state = {}; }
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw) { var s = JSON.parse(raw); Object.assign(state, s); }
+  } catch(e) {}
+  // ensure s1 always unlocked
+  if (!state.gates.s1) state.gates.s1 = { passed: false, checks: [false, false, false] };
 }
 
 function saveState() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-  catch(e) {}
-  const el = document.getElementById('saved-badge');
-  el.classList.add('show');
-  clearTimeout(window._saveTimer);
-  window._saveTimer = setTimeout(() => el.classList.remove('show'), 2000);
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {}
+  var el = document.getElementById('saved-tag');
+  if (el) { el.classList.add('show'); clearTimeout(window._st); window._st = setTimeout(function(){ el.classList.remove('show'); }, 2000); }
 }
 
-function getQ(id) { return state[id] || { answer: '', stars: 0 }; }
+function getAnswer(id) { return state.answers[id] || ''; }
+function getStars(id) { return state.stars[id] || 0; }
+function getGate(sid) { return state.gates[sid] || { passed: false, checks: [false, false, false] }; }
 
-// ─── STAR SVG ───────────────────────────────────────────────────────────────
-function starSVG(lit) {
-  return `<svg viewBox="0 0 24 24" fill="${lit?'currentColor':'none'}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+function isUnlocked(sid) {
+  if (sid === 's1') return true;
+  var idx = STEPS.findIndex(function(s){ return s.id === sid; });
+  if (idx <= 0) return false;
+  var prev = STEPS[idx - 1];
+  return getGate(prev.id).passed;
+}
+
+// ─── STARS HTML ──────────────────────────────────────────────────────────────
+
+function starsHTML(qid, val) {
+  var h = '<div class="q-stars" data-qid="' + qid + '">';
+  for (var i = 1; i <= 5; i++) {
+    var lit = i <= val;
+    h += '<span class="star' + (lit ? ' lit' : '') + '" data-n="' + i + '">';
+    h += '<svg viewBox="0 0 24 24" fill="' + (lit ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">';
+    h += '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>';
+    h += '</svg></span>';
+  }
+  h += '</div>';
+  return h;
+}
+
+// ─── RENDER SIDEBAR ──────────────────────────────────────────────────────────
+
+function renderSidebar() {
+  var h = '<div class="sidebar-header"><div class="sidebar-title">Specification Steps</div></div>';
+  h += '<div class="step-node-wrap">';
+  STEPS.forEach(function(step, si) {
+    var unlocked = isUnlocked(step.id);
+    var gate = getGate(step.id);
+    var active = state.activeStep === step.id;
+    var done = gate.passed;
+    var cls = 'step-node' + (active ? ' active' : '') + (done ? ' done' : '') + (!unlocked ? ' locked' : '');
+    // compute heat dots
+    var dots = '';
+    step.questions.forEach(function(q) {
+      var ans = getAnswer(q.id);
+      var st = getStars(q.id);
+      var dc = 'empty';
+      if (ans.trim().length > 10) {
+        if (st >= 4) dc = 'done';
+        else if (st >= 3) dc = 'good';
+        else if (st >= 1) dc = 'partial';
+        else dc = 'good';
+      }
+      dots += '<span class="heat-dot ' + dc + '"></span>';
+    });
+    var nodeClass = done ? 'done' : (active ? 'active' : (!unlocked ? 'locked' : ''));
+    h += '<div class="' + cls + '" data-step="' + step.id + '">';
+    h += '<div class="node-via ' + nodeClass + '">' + (done ? '✓' : step.n) + '</div>';
+    h += '<div class="node-info">';
+    h += '<div class="node-label">Step ' + step.n + '</div>';
+    h += '<div class="node-title">' + step.title + '</div>';
+    if (unlocked) {
+      h += '<div class="node-heat">' + dots + '</div>';
+    } else {
+      h += '<div class="node-lock-icon">🔒</div>';
+    }
+    h += '</div></div>';
+    if (si < STEPS.length - 1) {
+      h += '<div class="trace-line' + (done ? ' done' : '') + '"></div>';
+    }
+  });
+  h += '</div>';
+  document.getElementById('sidebar').innerHTML = h;
 }
 
 // ─── RENDER FORM ─────────────────────────────────────────────────────────────
+
 function renderForm() {
-  let html = '';
-  STEPS.forEach(step => {
-    const filled = step.questions.filter(q => (getQ(q.id).answer || '').trim().length > 10).length;
-    html += `<div class="step-block" id="${step.id}">`;
-    html += `<div class="step-tag">${step.tag}</div>`;
-    html += `<div class="step-title">${step.title}</div>`;
-    html += `<div class="step-desc">${step.desc}</div>`;
-    // Step progress pips
-    html += `<div class="step-progress">`;
-    step.questions.forEach(q => {
-      const ans = (getQ(q.id).answer || '').trim();
-      const cls = ans.length > 30 ? 'done' : ans.length > 5 ? 'partial' : '';
-      html += `<div class="step-pip ${cls}" id="pip-${q.id}"></div>`;
+  var h = '';
+  STEPS.forEach(function(step) {
+    var unlocked = isUnlocked(step.id);
+    var active = state.activeStep === step.id;
+    var gate = getGate(step.id);
+    h += '<div class="step-panel' + (active ? ' active' : '') + '" id="panel-' + step.id + '">';
+    // Head
+    h += '<div class="step-head">';
+    h += '<div class="step-kicker">Step ' + step.n + ' of 05 &nbsp;·&nbsp; ' + (unlocked ? 'Unlocked' : 'Locked') + '</div>';
+    h += '<div class="step-title">' + step.title + '</div>';
+    h += '<div class="step-desc">' + step.desc + '</div>';
+    // Pips
+    h += '<div class="step-pips">';
+    step.questions.forEach(function(q) {
+      var ans = getAnswer(q.id);
+      var st = getStars(q.id);
+      var pc = ans.trim().length > 10 ? (st >= 3 ? 'done' : 'partial') : '';
+      h += '<div class="s-pip ' + pc + '" id="pip-' + q.id + '"></div>';
     });
-    html += `</div>`;
+    h += '</div>';
+    h += '</div>';
     // Questions
-    step.questions.forEach(q => {
-      const s = getQ(q.id);
-      const wordCount = s.answer ? s.answer.trim().split(/\s+/).filter(Boolean).length : 0;
-      const hasContent = s.answer && s.answer.trim().length > 5;
-      html += `
-        <div class="q-card" id="card-${q.id}">
-          <div class="q-card-header">
-            <div class="q-num">${q.id.toUpperCase()}</div>
-            <div class="q-title">${q.title}</div>
-            <div class="q-stars" id="stars-${q.id}">
-              ${[1,2,3,4,5].map(i => `<span class="star${i<=s.stars?' lit':''}" data-qid="${q.id}" data-n="${i}" onclick="setStar('${q.id}',${i})">${starSVG(i<=s.stars)}</span>`).join('')}
-            </div>
-          </div>
-          <div class="q-guide">${q.guide}</div>
-          <div class="q-answer">
-            <textarea
-              id="ans-${q.id}"
-              placeholder="Write your answer here…"
-              oninput="setAnswer('${q.id}',this.value)"
-              class="${hasContent?'has-content':''}"
-            >${s.answer||''}</textarea>
-          </div>
-          <div class="q-footer">
-            <span class="q-confidence-label${s.stars ? ' rated' : ''}">${s.stars ? ['','Low','Fair','Good','High','Locked'][s.stars]+' confidence' : 'Rate your confidence →'}</span>
-            <span class="q-wordcount" id="wc-${q.id}">${wordCount>0?wordCount+' words':''}</span>
-          </div>
-        </div>`;
+    step.questions.forEach(function(q) {
+      var ans = getAnswer(q.id);
+      var st = getStars(q.id);
+      var conf = st >= 4 ? 'high' : (st >= 3 ? 'mid' : (st >= 1 ? 'low' : ''));
+      var confLabel = st ? CONF_LABELS[st] + ' confidence' : 'Rate confidence →';
+      var wc = ans.trim() ? ans.trim().split(/\s+/).length : 0;
+      h += '<div class="q-card" id="card-' + q.id + '" data-conf="' + conf + '">';
+      h += '<div class="q-top"><div class="q-id">' + q.id.toUpperCase() + '</div>';
+      h += '<div class="q-title">' + q.title + '</div>';
+      h += starsHTML(q.id, st) + '</div>';
+      h += '<div class="q-guide">' + q.guide + '</div>';
+      h += '<div class="q-body"><textarea class="q-textarea' + (ans ? ' has-value' : '') + '" data-qid="' + q.id + '" placeholder="Write your answer here…" rows="4">' + escAttr(ans) + '</textarea></div>';
+      h += '<div class="q-foot">';
+      h += '<span class="q-conf-label' + (st ? ' rated' : '') + '" id="clabel-' + q.id + '">' + confLabel + '</span>';
+      h += '<span class="q-wc" id="wc-' + q.id + '">' + (wc ? wc + ' words' : '') + '</span>';
+      h += '</div></div>';
     });
-    html += `</div>`;
-  });
-  document.getElementById('form-inner').innerHTML = html;
-  updateProgress();
-  updatePreview();
-}
-
-// ─── ACTIONS ─────────────────────────────────────────────────────────────────
-function setAnswer(id, val) {
-  state[id] = { ...getQ(id), answer: val };
-  saveState();
-  // Update pip
-  const pip = document.getElementById('pip-' + id);
-  if (pip) {
-    const len = val.trim().length;
-    pip.className = 'step-pip' + (len > 30 ? ' done' : len > 5 ? ' partial' : '');
-  }
-  // Update textarea class
-  const ta = document.getElementById('ans-' + id);
-  if (ta) ta.className = val.trim().length > 5 ? 'has-content' : '';
-  // Word count
-  const wc = document.getElementById('wc-' + id);
-  if (wc) {
-    const words = val.trim().split(/\s+/).filter(Boolean).length;
-    wc.textContent = words > 0 ? words + ' words' : '';
-  }
-  updateProgress();
-  updatePreview();
-}
-
-function setStar(id, n) {
-  const s = getQ(id);
-  const newStars = s.stars === n ? 0 : n;
-  state[id] = { ...s, stars: newStars };
-  saveState();
-  const container = document.getElementById('stars-' + id);
-  if (container) {
-    container.querySelectorAll('.star').forEach((el, i) => {
-      el.className = 'star' + (i < newStars ? ' lit' : '');
-      el.innerHTML = starSVG(i < newStars);
-    });
-  }
-  // Update confidence label
-  const card = document.getElementById('card-' + id);
-  if (card) {
-    const label = card.querySelector('.q-confidence-label');
-    if (label) {
-      label.className = 'q-confidence-label' + (newStars ? ' rated' : '');
-      label.textContent = newStars ? ['','Low','Fair','Good','High','Locked'][newStars]+' confidence' : 'Rate your confidence →';
+    // Gate
+    if (gate.passed) {
+      h += '<div class="gate"><div class="gate-passed-note">✓ &nbsp; Gate passed — Step ' + step.n + ' complete</div></div>';
+    } else if (unlocked) {
+      h += '<div class="gate">';
+      h += '<div class="gate-title">Step ' + step.n + ' Review Gate</div>';
+      h += '<div class="gate-sub">Before advancing, confirm each statement is true for your project. Honest answers only — a false "yes" here becomes a failed prototype later.</div>';
+      h += '<div class="gate-checks">';
+      step.gate.forEach(function(text, gi) {
+        var checked = gate.checks[gi];
+        h += '<div class="gate-item" data-step="' + step.id + '" data-gi="' + gi + '">';
+        h += '<div class="gate-box' + (checked ? ' checked' : '') + '" id="gbox-' + step.id + '-' + gi + '"></div>';
+        h += '<div class="gate-item-text">' + text + '</div></div>';
+      });
+      h += '</div>';
+      var allChecked = gate.checks.every(function(c){ return c; });
+      h += '<button class="gate-btn" id="gate-btn-' + step.id + '"' + (allChecked ? '' : ' disabled') + ' data-step="' + step.id + '">';
+      h += allChecked ? '✓ &nbsp; Unlock Next Step' : 'Check all items to continue';
+      h += '</button></div>';
     }
+    h += '</div>';
+  });
+  document.getElementById('form-inner').innerHTML = h;
+}
+
+function escAttr(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── RENDER RIGHT PANEL ───────────────────────────────────────────────────────
+
+function renderRightPanel() {
+  if (state.activeTab === 'brief') renderBrief();
+  else renderRisks();
+}
+
+function renderBrief() {
+  var totalQ = 0, answered = 0;
+  STEPS.forEach(function(s){ s.questions.forEach(function(q){ totalQ++; if (getAnswer(q.id).trim().length > 5) answered++; }); });
+  var pct = totalQ ? Math.round(answered / totalQ * 100) : 0;
+  if (answered === 0) {
+    document.getElementById('rp-body').innerHTML = '<div class="brief-empty"><div class="brief-empty-icon">📄</div><div class="brief-empty-text">Answer the questions on the left.<br>Your brief builds here in real time.</div></div>';
+    return;
   }
-  updatePreview();
+  var date = new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'});
+  var h = '<div class="brief-masthead"><div class="brief-brand">Fresu Electronics</div>';
+  h += '<div class="brief-h1">Product Specification Brief</div>';
+  h += '<div class="brief-meta">' + date + ' &nbsp;·&nbsp; ' + answered + ' / ' + totalQ + ' answered</div></div>';
+  h += '<div class="brief-comp"><div class="brief-comp-label">Completeness</div>';
+  h += '<div class="brief-comp-bar"><div class="brief-comp-fill" style="width:' + pct + '%"></div></div>';
+  h += '<div class="brief-comp-pct">' + pct + '%</div></div>';
+  STEPS.forEach(function(step) {
+    var hasAny = step.questions.some(function(q){ return getAnswer(q.id).trim().length > 5; });
+    if (!hasAny) return;
+    h += '<div class="brief-section"><div class="brief-section-title">' + step.title + '</div>';
+    step.questions.forEach(function(q) {
+      var ans = getAnswer(q.id).trim();
+      var st = getStars(q.id);
+      var starsH = '';
+      if (st) {
+        starsH = '<span class="brief-stars">';
+        for (var i = 1; i <= 5; i++) starsH += '<span class="brief-star' + (i <= st ? '' : ' off') + '">' + (i <= st ? '★' : '☆') + '</span>';
+        starsH += '</span>';
+      }
+      h += '<div class="brief-item"><div class="brief-q">' + q.title + starsH + '</div>';
+      h += '<div class="brief-a' + (ans ? '' : ' empty') + '">' + (ans ? ans.replace(/\n/g,'<br>') : 'Not answered') + '</div></div>';
+    });
+    h += '</div>';
+  });
+  document.getElementById('rp-body').innerHTML = h;
+}
+
+function renderRisks() {
+  var risks = [];
+  STEPS.forEach(function(step) {
+    step.questions.forEach(function(q) {
+      var ans = getAnswer(q.id).trim();
+      var st = getStars(q.id);
+      if (ans.length > 5 && st > 0 && st <= 2) {
+        risks.push({ q: q, st: st, ans: ans, severity: st === 1 ? 'critical' : 'medium' });
+      }
+      if (isUnlocked(step.id) && ans.length === 0) {
+        risks.push({ q: q, st: 0, ans: '', severity: 'medium' });
+      }
+    });
+  });
+  // Update badge
+  var badge = document.getElementById('risk-badge');
+  var rc = document.getElementById('risk-count');
+  if (badge) { badge.className = 'risk-badge' + (risks.length ? '' : ' hidden'); }
+  if (rc) rc.textContent = risks.length;
+
+  if (risks.length === 0) {
+    document.getElementById('rp-body').innerHTML = '<div class="risk-empty">No risks flagged yet.<br><br>Risks appear here when you rate a completed answer with 1–2 stars (low confidence), or leave a question unanswered in an unlocked step.</div>';
+    return;
+  }
+  var h = '<div class="risk-header"><div class="risk-header-title">' + risks.length + ' Open Risk' + (risks.length > 1 ? 's' : '') + '</div><div class="risk-header-sub">Sourced from low-confidence answers and unanswered questions in unlocked steps.</div></div>';
+  risks.forEach(function(r) {
+    h += '<div class="risk-item ' + r.severity + '">';
+    h += '<div class="risk-badge-label">' + (r.severity === 'critical' ? 'HIGH RISK' : 'MEDIUM RISK') + '</div>';
+    h += '<div class="risk-item-q">' + r.q.title + '</div>';
+    if (r.ans) {
+      h += '<div class="risk-item-a">' + r.ans.substring(0, 100) + (r.ans.length > 100 ? '…' : '') + '</div>';
+      h += '<div class="risk-item-stars">' + CONF_LABELS[r.st] + ' confidence (' + r.st + '/5 stars)</div>';
+    } else {
+      h += '<div class="risk-item-a">Not yet answered</div>';
+    }
+    h += '</div>';
+  });
+  document.getElementById('rp-body').innerHTML = h;
 }
 
 // ─── PROGRESS ────────────────────────────────────────────────────────────────
+
 function updateProgress() {
-  const answered = STEPS.reduce((n, s) =>
-    n + s.questions.filter(q => (getQ(q.id).answer||'').trim().length > 10).length, 0);
-  const pct = Math.round(answered / TOTAL_Q * 100);
-  const fill = document.getElementById('nav-fill');
-  const label = document.getElementById('nav-label');
+  var total = 0, done = 0;
+  STEPS.forEach(function(s) { s.questions.forEach(function(q) { total++; if (getAnswer(q.id).trim().length > 10) done++; }); });
+  var pct = total ? Math.round(done / total * 100) : 0;
+  var fill = document.getElementById('nav-bar-fill');
+  var pctEl = document.getElementById('nav-pct');
+  var labelEl = document.getElementById('nav-step-label');
   if (fill) fill.style.width = pct + '%';
-  if (label) label.textContent = answered + ' / ' + TOTAL_Q;
+  if (pctEl) pctEl.textContent = pct + '%';
+  var idx = STEPS.findIndex(function(s){ return s.id === state.activeStep; });
+  if (labelEl) labelEl.textContent = 'Step ' + (idx + 1) + ' of 5';
 }
 
-// ─── PREVIEW ─────────────────────────────────────────────────────────────────
-function updatePreview() {
-  const answered = STEPS.reduce((n, s) =>
-    n + s.questions.filter(q => (getQ(q.id).answer||'').trim().length > 5).length, 0);
+// ─── FULL REFRESH ────────────────────────────────────────────────────────────
 
-  if (answered === 0) {
-    document.getElementById('preview-inner').innerHTML = `
-      <div class="preview-empty">
-        <div class="preview-empty-icon">📄</div>
-        <div class="preview-empty-text">Start answering questions on the left.<br>Your brief builds here in real time.</div>
-      </div>`;
+function refresh() {
+  updateProgress();
+  renderSidebar();
+  renderRightPanel();
+}
+
+// ─── SWITCH STEP ─────────────────────────────────────────────────────────────
+
+function switchStep(sid) {
+  if (!isUnlocked(sid)) return;
+  state.activeStep = sid;
+  saveState();
+  document.querySelectorAll('.step-panel').forEach(function(p){ p.classList.remove('active'); });
+  var panel = document.getElementById('panel-' + sid);
+  if (panel) { panel.classList.add('active'); panel.parentElement.scrollTop = 0; }
+  refresh();
+}
+
+// ─── SWITCH TAB ──────────────────────────────────────────────────────────────
+
+function switchTab(tab) {
+  state.activeTab = tab;
+  document.querySelectorAll('.rp-tab').forEach(function(t){ t.classList.remove('active'); });
+  var tabEl = document.getElementById('tab-' + tab);
+  if (tabEl) tabEl.classList.add('active');
+  renderRightPanel();
+}
+
+// ─── EVENT DELEGATION ────────────────────────────────────────────────────────
+
+document.addEventListener('click', function(e) {
+  // Star click
+  var star = e.target.closest('.star');
+  if (star) {
+    var starsWrap = star.closest('.q-stars');
+    if (starsWrap) {
+      var qid = starsWrap.getAttribute('data-qid');
+      var n = parseInt(star.getAttribute('data-n'), 10);
+      handleStarClick(qid, n);
+    }
     return;
   }
+  // Step node click
+  var stepNode = e.target.closest('.step-node');
+  if (stepNode) {
+    var sid = stepNode.getAttribute('data-step');
+    if (sid) switchStep(sid);
+    return;
+  }
+  // Gate item click
+  var gateItem = e.target.closest('.gate-item');
+  if (gateItem) {
+    var sid2 = gateItem.getAttribute('data-step');
+    var gi = parseInt(gateItem.getAttribute('data-gi'), 10);
+    handleGateCheck(sid2, gi);
+    return;
+  }
+  // Gate button click
+  var gateBtn = e.target.closest('.gate-btn');
+  if (gateBtn && !gateBtn.disabled) {
+    var sid3 = gateBtn.getAttribute('data-step');
+    handleGateUnlock(sid3);
+    return;
+  }
+  // Risk badge click
+  if (e.target.closest('.risk-badge')) {
+    switchTab('risks');
+  }
+});
 
-  const date = new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'});
-  const pct = Math.round(answered / TOTAL_Q * 100);
+document.addEventListener('input', function(e) {
+  if (e.target.classList.contains('q-textarea')) {
+    handleAnswerInput(e.target);
+  }
+});
 
-  let html = `<div class="brief-doc">`;
-  html += `<div class="brief-masthead">`;
-  html += `<div class="brief-logo">Fresu Electronics</div>`;
-  html += `<div class="brief-h1">Product Specification Brief</div>`;
-  html += `<div class="brief-meta">Generated ${date} &nbsp;·&nbsp; ${answered} of ${TOTAL_Q} questions answered</div>`;
-  html += `</div>`;
-
-  STEPS.forEach(step => {
-    const hasAny = step.questions.some(q => (getQ(q.id).answer||'').trim().length > 5);
-    if (!hasAny) return;
-    html += `<div class="brief-section">`;
-    html += `<div class="brief-section-title">${step.title}</div>`;
-    step.questions.forEach(q => {
-      const s = getQ(q.id);
-      const ans = (s.answer||'').trim();
-      html += `<div class="brief-item">`;
-      html += `<div class="brief-item-q">${q.title}</div>`;
-      if (ans) {
-        html += `<div class="brief-item-a">${ans.replace(/\n/g,'<br>')}</div>`;
-        if (s.stars) {
-          html += `<div class="brief-stars">`;
-          for (let i=1;i<=5;i++) html += `<span class="brief-star${i<=s.stars?'':' off'}">${i<=s.stars?'★':'☆'}</span>`;
-          html += `</div>`;
-        }
-      } else {
-        html += `<div class="brief-item-a empty">Not yet answered</div>`;
-      }
-      html += `</div>`;
-    });
-    html += `</div>`;
+// Hover effect for stars
+document.addEventListener('mouseover', function(e) {
+  var star = e.target.closest('.star');
+  if (!star) return;
+  var n = parseInt(star.getAttribute('data-n'), 10);
+  var starsWrap = star.closest('.q-stars');
+  if (!starsWrap) return;
+  starsWrap.querySelectorAll('.star').forEach(function(s, i) {
+    s.classList.toggle('hover-on', i < n);
   });
+});
+document.addEventListener('mouseout', function(e) {
+  var star = e.target.closest('.star');
+  if (!star) return;
+  var starsWrap = star.closest('.q-stars');
+  if (!starsWrap) return;
+  starsWrap.querySelectorAll('.star').forEach(function(s) { s.classList.remove('hover-on'); });
+});
 
-  html += `<div class="brief-completeness">`;
-  html += `<div class="brief-comp-label">Spec completeness</div>`;
-  html += `<div class="brief-comp-bar"><div class="brief-comp-fill" style="width:${pct}%"></div></div>`;
-  html += `<div class="brief-comp-pct">${pct}% complete</div>`;
-  html += `</div>`;
-  html += `</div>`;
+// ─── HANDLERS ────────────────────────────────────────────────────────────────
 
-  document.getElementById('preview-inner').innerHTML = html;
+function handleAnswerInput(ta) {
+  var qid = ta.getAttribute('data-qid');
+  var val = ta.value;
+  state.answers[qid] = val;
+  saveState();
+  var len = val.trim().length;
+  var st = getStars(qid);
+  ta.className = 'q-textarea' + (len > 5 ? ' has-value' : '');
+  // Update pip
+  var pip = document.getElementById('pip-' + qid);
+  if (pip) {
+    var pc = len > 10 ? (st >= 3 ? 'done' : 'partial') : '';
+    pip.className = 's-pip ' + pc;
+  }
+  // Word count
+  var wc = document.getElementById('wc-' + qid);
+  if (wc) { var words = val.trim().split(/\s+/).filter(Boolean).length; wc.textContent = words ? words + ' words' : ''; }
+  // Card conf border
+  updateCardConf(qid);
+  updateProgress();
+  renderRightPanel();
+  renderSidebar();
 }
 
-// ─── EXPORT HTML BRIEF ────────────────────────────────────────────────────────
-function exportBrief() {
-  const date = new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'});
-  const slug = new Date().toISOString().split('T')[0];
-  const answered = STEPS.reduce((n,s)=>n+s.questions.filter(q=>(getQ(q.id).answer||'').trim().length>5).length,0);
-  const pct = Math.round(answered/TOTAL_Q*100);
-
-  let sections = '';
-  STEPS.forEach(step => {
-    let items = '';
-    step.questions.forEach(q => {
-      const s = getQ(q.id);
-      const ans = (s.answer||'').trim();
-      const stars = s.stars ? '★'.repeat(s.stars)+'☆'.repeat(5-s.stars) : '';
-      items += `
-        <div style="padding:14px 0;border-bottom:1px solid #2a2a2a">
-          <div style="font-family:monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#a0aab8;margin-bottom:4px">${q.title}${stars?`  <span style="color:#00FF94">${stars}</span>`:''}</div>
-          <div style="font-size:14px;color:${ans?'#e8edf5':'#555'};line-height:1.65;white-space:pre-wrap">${ans||'Not answered'}</div>
-        </div>`;
-    });
-    sections += `
-      <div style="margin-bottom:32px">
-        <div style="font-family:monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#00FF94;border-bottom:1px solid #383838;padding-bottom:10px;margin-bottom:0">${step.title}</div>
-        ${items}
-      </div>`;
-  });
-
-  const html = `<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><title>Product Specification Brief — ${date}</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#0a0a0a;color:#e8edf5;font-family:'Poppins',sans-serif;font-size:15px;line-height:1.7;padding:40px 24px 80px}
-.wrap{max-width:720px;margin:0 auto}
-.top-bar{display:flex;align-items:baseline;justify-content:space-between;padding-bottom:20px;border-bottom:2px solid #00FF94;margin-bottom:32px;flex-wrap:wrap;gap:8px}
-.brand{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#00FF94}
-.doc-title{font-size:28px;font-weight:800;letter-spacing:-.03em;color:#fff;margin:8px 0 4px}
-.meta{font-family:monospace;font-size:11px;color:#666;letter-spacing:.06em}
-.comp-bar-wrap{margin:24px 0 32px}
-.comp-label{font-family:monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#a0aab8;margin-bottom:8px}
-.comp-bar{height:3px;background:#2a2a2a;margin-bottom:4px}
-.comp-fill{height:100%;background:#00FF94}
-.comp-pct{font-family:monospace;font-size:12px;font-weight:700;color:#00FF94}
-.footer{margin-top:48px;padding-top:20px;border-top:1px solid #1c1c1c;font-family:monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#555;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
-</style></head>
-<body><div class="wrap">
-<div class="top-bar">
-  <span class="brand">Fresu Electronics</span>
-  <span class="meta">fresuelectronics.com</span>
-</div>
-<div class="doc-title">Product Specification Brief</div>
-<div class="meta">Generated ${date} &nbsp;·&nbsp; ${answered} of ${TOTAL_Q} questions answered</div>
-<div class="comp-bar-wrap">
-  <div class="comp-label">Spec completeness</div>
-  <div class="comp-bar"><div class="comp-fill" style="width:${pct}%"></div></div>
-  <div class="comp-pct">${pct}%</div>
-</div>
-${sections}
-<div class="footer">
-  <span>Fresu Electronics SRL · fresuelectronics.com</span>
-  <span>Hardware Specification Guide</span>
-</div>
-</div></body></html>`;
-
-  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = `product-spec-brief-${slug}.html`;
-  document.body.appendChild(a); a.click();
-  document.body.removeChild(a); URL.revokeObjectURL(url);
+function handleStarClick(qid, n) {
+  var prev = getStars(qid);
+  var newSt = prev === n ? 0 : n;
+  state.stars[qid] = newSt;
+  saveState();
+  // Re-render stars in place
+  var starsWrap = document.querySelector('.q-stars[data-qid="' + qid + '"]');
+  if (starsWrap) {
+    starsWrap.innerHTML = '';
+    for (var i = 1; i <= 5; i++) {
+      var lit = i <= newSt;
+      var span = document.createElement('span');
+      span.className = 'star' + (lit ? ' lit' : '');
+      span.setAttribute('data-n', i);
+      span.innerHTML = '<svg viewBox="0 0 24 24" fill="' + (lit ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+      starsWrap.appendChild(span);
+    }
+  }
+  // Update confidence label
+  var clabel = document.getElementById('clabel-' + qid);
+  if (clabel) {
+    clabel.className = 'q-conf-label' + (newSt ? ' rated' : '');
+    clabel.textContent = newSt ? CONF_LABELS[newSt] + ' confidence' : 'Rate confidence →';
+  }
+  // Update pip
+  var pip = document.getElementById('pip-' + qid);
+  if (pip) {
+    var ans = getAnswer(qid);
+    var pc = ans.trim().length > 10 ? (newSt >= 3 ? 'done' : 'partial') : '';
+    pip.className = 's-pip ' + pc;
+  }
+  updateCardConf(qid);
+  renderRightPanel();
+  renderSidebar();
 }
 
-// ─── DOWNLOAD TOOL ────────────────────────────────────────────────────────────
+function updateCardConf(qid) {
+  var card = document.getElementById('card-' + qid);
+  if (!card) return;
+  var st = getStars(qid);
+  var conf = st >= 4 ? 'high' : (st >= 3 ? 'mid' : (st >= 1 ? 'low' : ''));
+  card.setAttribute('data-conf', conf);
+}
+
+function handleGateCheck(sid, gi) {
+  if (!state.gates[sid]) state.gates[sid] = { passed: false, checks: [false, false, false] };
+  state.gates[sid].checks[gi] = !state.gates[sid].checks[gi];
+  saveState();
+  var box = document.getElementById('gbox-' + sid + '-' + gi);
+  if (box) box.className = 'gate-box' + (state.gates[sid].checks[gi] ? ' checked' : '');
+  var allChecked = state.gates[sid].checks.every(function(c){ return c; });
+  var btn = document.getElementById('gate-btn-' + sid);
+  if (btn) {
+    btn.disabled = !allChecked;
+    btn.textContent = allChecked ? '✓  Unlock Next Step' : 'Check all items to continue';
+  }
+}
+
+function handleGateUnlock(sid) {
+  if (!state.gates[sid]) state.gates[sid] = { passed: false, checks: [false, false, false] };
+  var allChecked = state.gates[sid].checks.every(function(c){ return c; });
+  if (!allChecked) return;
+  state.gates[sid].passed = true;
+  // Unlock next step
+  var idx = STEPS.findIndex(function(s){ return s.id === sid; });
+  if (idx < STEPS.length - 1) {
+    var nextSid = STEPS[idx + 1].id;
+    if (!state.gates[nextSid]) state.gates[nextSid] = { passed: false, checks: [false, false, false] };
+    saveState();
+    // Update gate section inline
+    var gate = document.querySelector('#panel-' + sid + ' .gate');
+    if (gate) gate.innerHTML = '<div class="gate-passed-note">✓ &nbsp; Gate passed — Step ' + STEPS[idx].n + ' complete</div>';
+    switchStep(nextSid);
+  } else {
+    saveState();
+    var gate2 = document.querySelector('#panel-' + sid + ' .gate');
+    if (gate2) gate2.innerHTML = '<div class="gate-passed-note">✓ &nbsp; Spec complete — all steps passed</div>';
+    refresh();
+  }
+}
+
+// ─── EXPORT / SAVE ───────────────────────────────────────────────────────────
+
 function downloadTool() {
-  const src = document.documentElement.outerHTML;
-  const blob = new Blob([src], { type: 'text/html;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  var src = document.documentElement.outerHTML;
+  var blob = new Blob([src], { type: 'text/html;charset=utf-8' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
   a.href = url; a.download = 'hardware-spec-guide.html';
   document.body.appendChild(a); a.click();
   document.body.removeChild(a); URL.revokeObjectURL(url);
 }
 
 // ─── RESET ───────────────────────────────────────────────────────────────────
+
 function showReset() { document.getElementById('overlay').classList.add('open'); }
 function hideReset() { document.getElementById('overlay').classList.remove('open'); }
 function confirmReset() {
-  state = {};
-  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+  state = { answers: {}, stars: {}, gates: { s1: { passed: false, checks: [false, false, false] } }, activeStep: 's1', activeTab: 'brief' };
+  try { localStorage.removeItem(KEY); } catch(e) {}
   hideReset();
   renderForm();
+  refresh();
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
+
 loadState();
+if (!state.gates) state.gates = {};
+if (!state.gates.s1) state.gates.s1 = { passed: false, checks: [false, false, false] };
 renderForm();
+refresh();
 </script>
 </body>
 </html>
