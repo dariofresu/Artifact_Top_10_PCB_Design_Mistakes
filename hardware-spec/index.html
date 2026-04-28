@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hardware Specification Guide — Fresu Electronics</title>
+<meta name="description" content="Define your hardware product spec before you touch a schematic. The interactive pre-design worksheet by Dario Fresu, Fresu Electronics.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;--surface:#111111;--surface-2:#181818;
+  --border:#242424;--border-light:#1a1a1a;
+  --fg:#ffffff;--fg-secondary:#e8edf5;--label:#a0aab8;--label-dim:#6b7d8f;
+  --accent:#00FF94;--accent-dim:rgba(0,255,148,0.10);--accent-hover:#00e085;
+  --wrong:#ff4d4d;--ease:cubic-bezier(0.22,1,0.36,1);
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:'Poppins',sans-serif;font-size:16px;line-height:1.7;overflow-x:hidden;min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+button{font-family:'Poppins',sans-serif;cursor:pointer}
+
+/* ─── NAV ─── */
+.nav{background:rgba(10,10,10,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:12px 0;position:sticky;top:0;z-index:100}
+.nav-inner{max-width:1100px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nav-logo img{height:40px;width:auto;display:block}
+.nav-cta{background:var(--accent);color:#0a0a0a;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:10px 20px;border-radius:2px;text-decoration:none;transition:background .2s}
+.nav-cta:hover{background:var(--accent-hover)}
+
+/* ─── HERO ─── */
+.hero{max-width:1100px;margin:0 auto;padding:60px 24px 40px}
+.kicker{font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.kicker::before{content:'';width:24px;height:1px;background:var(--accent)}
+.hero h1{font-size:clamp(28px,6vw,52px);font-weight:800;letter-spacing:-.04em;line-height:1.06;margin-bottom:12px}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero-sub{font-size:clamp(14px,2.5vw,17px);color:var(--fg-secondary);max-width:560px;line-height:1.7;margin-bottom:24px}
+.author-row{display:flex;align-items:center;gap:12px;padding:16px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:0}
+.author-row img{width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--accent)}
+.author-row p{margin:0;font-size:12px;font-weight:600;color:var(--fg);line-height:1.3}
+.author-row span{font-size:11px;color:var(--label)}
+
+/* ─── INSTRUCTIONS ─── */
+.instructions{max-width:1100px;margin:0 auto;padding:0 24px 32px}
+.instr-toggle{background:var(--surface);border:1px solid var(--border);padding:14px 20px;width:100%;text-align:left;display:flex;align-items:center;justify-content:space-between;color:var(--label);font-size:13px;font-weight:600;letter-spacing:.04em;transition:all .2s}
+.instr-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.instr-toggle .arrow{transition:transform .25s var(--ease)}
+.instr-toggle.open .arrow{transform:rotate(180deg)}
+.instr-body{background:var(--surface);border:1px solid var(--border);border-top:none;padding:0;max-height:0;overflow:hidden;transition:max-height .35s var(--ease),padding .35s var(--ease)}
+.instr-body.open{max-height:600px;padding:24px 24px 28px}
+.instr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:16px}
+.instr-item{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:flex-start}
+.instr-num{font-size:11px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;padding-top:2px}
+.instr-text{font-size:13px;color:var(--fg-secondary);line-height:1.6}
+.instr-text strong{color:var(--fg);font-weight:600}
+.instr-callout{background:var(--surface-2);border-left:2px solid var(--accent);padding:12px 16px;margin-top:16px;font-size:13px;color:var(--fg-secondary);line-height:1.6;border-radius:0 2px 2px 0}
+
+/* ─── TOOLBAR ─── */
+.toolbar{max-width:1100px;margin:0 auto;padding:0 24px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.progress-wrap{flex:1;min-width:200px;display:flex;align-items:center;gap:14px}
+.progress-bar{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s var(--ease);width:0%}
+.progress-label{font-size:11px;font-weight:700;color:var(--label);font-variant-numeric:tabular-nums;min-width:4ch;text-align:right}
+.btn-primary{background:var(--accent);color:#0a0a0a;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border:none;border-radius:2px;transition:background .2s,transform .15s}
+.btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px)}
+.btn-secondary{background:transparent;color:var(--accent);font-size:13px;font-weight:600;padding:11px 23px;border:1px solid var(--accent);border-radius:2px;transition:all .2s}
+.btn-secondary:hover{background:var(--accent-dim)}
+.btn-ghost{background:transparent;color:var(--label);font-size:12px;font-weight:500;padding:11px 18px;border:1px solid var(--border);border-radius:2px;transition:all .2s}
+.btn-ghost:hover{border-color:var(--wrong);color:var(--wrong)}
+.saved-dot{font-size:11px;color:var(--label);display:flex;align-items:center;gap:6px;opacity:0;transition:opacity .3s}
+.saved-dot.show{opacity:1}
+.saved-dot::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent)}
+
+/* ─── MAIN LAYOUT ─── */
+.main{max-width:1100px;margin:0 auto;padding:0 24px 80px;display:grid;grid-template-columns:240px 1fr;gap:0;align-items:start}
+.step-nav{position:sticky;top:76px;padding:0 0 40px}
+.step-nav-title{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--label);padding:0 0 12px;margin-bottom:4px;border-bottom:1px solid var(--border)}
+.step-btn{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;padding:12px 14px;background:transparent;border:none;border-left:2px solid transparent;color:var(--label);font-size:13px;font-weight:500;line-height:1.35;transition:all .18s;cursor:pointer}
+.step-btn:hover{color:var(--fg);border-left-color:var(--border)}
+.step-btn.active{color:var(--fg);border-left-color:var(--accent);background:rgba(0,255,148,.04)}
+.step-btn.done .step-dot{background:var(--accent)}
+.step-dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0;margin-top:5px;transition:background .2s}
+.step-btn.active .step-dot{background:var(--accent)}
+.step-btn-num{font-size:10px;font-weight:700;color:var(--accent);font-family:'Poppins',sans-serif;margin-right:2px;min-width:16px}
+
+/* ─── CATEGORIES ─── */
+.categories{min-width:0}
+.category{margin-bottom:2px}
+.cat-header{padding:28px 28px 0;margin-bottom:20px}
+.cat-step{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.cat-step::before{content:'';width:20px;height:1px;background:var(--accent)}
+.cat-title{font-size:24px;font-weight:700;letter-spacing:-.02em;line-height:1.2;margin-bottom:6px}
+.cat-desc{font-size:14px;color:var(--label);line-height:1.6}
+.cat-body{padding:0 28px 28px}
+
+/* ─── ITEM ─── */
+.item{padding:18px 0;border-bottom:1px solid var(--border-light)}
+.item:last-child{border-bottom:none}
+.item-row{display:flex;align-items:flex-start;gap:14px}
+.item-check{width:20px;height:20px;min-width:20px;border:1.5px solid var(--border);border-radius:3px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s;margin-top:2px;flex-shrink:0}
+.item-check.checked{background:var(--accent);border-color:var(--accent)}
+.item-check.checked::after{content:'';width:6px;height:10px;border:2px solid #0a0a0a;border-top:none;border-left:none;transform:rotate(45deg);margin-top:-2px}
+.item-content{flex:1;min-width:0}
+.item-label{font-size:15px;font-weight:500;color:var(--fg);line-height:1.4;cursor:pointer;user-select:none}
+.item-hint{font-size:12px;color:var(--label);margin-top:3px;line-height:1.5}
+.item-stars{display:flex;gap:4px;margin-top:10px}
+.star{width:20px;height:20px;cursor:pointer;color:var(--border);transition:color .15s,transform .15s}
+.star:hover{color:var(--accent);transform:scale(1.15)}
+.star.lit{color:var(--accent)}
+.star svg{width:100%;height:100%;pointer-events:none}
+.item-notes{margin-top:10px;display:none}
+.item-notes.open{display:block}
+.item-notes textarea{width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--fg);font-family:'Poppins',sans-serif;font-size:13px;padding:10px 12px;resize:vertical;min-height:60px;border-radius:2px;outline:none;transition:border-color .18s;line-height:1.6}
+.item-notes textarea::placeholder{color:var(--label)}
+.item-notes textarea:focus{border-color:var(--accent)}
+.item-meta{display:flex;align-items:center;gap:10px;margin-top:8px}
+.notes-toggle{font-size:11px;color:var(--label);background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;padding:0;transition:color .15s}
+.notes-toggle:hover{color:var(--accent)}
+
+/* ─── CARD ─── */
+.cat-card{background:var(--surface);border:1px solid var(--border);border-radius:2px;margin-bottom:2px}
+.cat-card.active-card{border-color:rgba(0,255,148,.18)}
+
+/* ─── MILESTONE ─── */
+.milestone{background:var(--surface-2);border:1px solid var(--border);border-left:3px solid var(--accent);padding:20px 24px;margin:24px 28px 4px;border-radius:0 2px 2px 0}
+.milestone-label{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.milestone-text{font-size:14px;color:var(--fg-secondary);line-height:1.6}
+
+/* ─── MODAL ─── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);max-width:420px;width:100%;padding:32px}
+.modal h2{font-size:18px;font-weight:700;letter-spacing:-.02em;margin-bottom:8px}
+.modal p{font-size:14px;color:var(--fg-secondary);line-height:1.6;margin-bottom:24px}
+.modal-actions{display:flex;gap:10px}
+
+/* ─── FOOTER ─── */
+footer{border-top:1px solid var(--border-light);padding:28px 24px;text-align:center}
+.footer-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-brand{font-size:12px;color:var(--accent);font-weight:600}
+.footer-legal{font-size:11px;color:var(--label-dim)}
+
+/* ─── MOBILE ─── */
+@media(max-width:768px){
+  .main{grid-template-columns:1fr}
+  .step-nav{display:none}
+  .hero{padding:40px 20px 28px}
+  .instructions{padding:0 20px 24px}
+  .toolbar{padding:0 20px 20px}
+  .main{padding:0 20px 60px}
+  .cat-header{padding:20px 20px 0}
+  .cat-body{padding:0 20px 20px}
+  .milestone{margin:20px 20px 4px}
+  .modal-actions{flex-direction:column}
+  .nav-inner{padding:0 16px}
+}
+@media(max-width:390px){
+  .hero h1{font-size:26px}
+  .cat-title{font-size:20px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="https://www.fresuelectronics.com">
+      <img src="https://raw.githubusercontent.com/dariofresu/Fresu-Electronics-Blog/main/assets/logo.png" alt="Fresu Electronics">
+    </a>
+    <a class="nav-cta" href="https://www.fresuelectronics.com/emc-audit">Work with Dario →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="kicker">Hardware Specification Guide</div>
+  <h1>Define the product<br><em>before</em> the schematic.</h1>
+  <p class="hero-sub">The #1 hardware mistake is jumping to schematics before your product vision is clear. This worksheet changes that. Work through each step — your answers become a Product Specification Brief.</p>
+  <div class="author-row">
+    <img src="https://raw.githubusercontent.com/dariofresu/Fresu-Electronics-Blog/main/assets/dario-fresu.jpg" alt="Dario Fresu">
+    <div>
+      <p>Dario Fresu</p>
+      <span>Principal EMC Architect · Fresu Electronics</span>
+    </div>
+  </div>
+</header>
+
+<!-- INSTRUCTIONS -->
+<div class="instructions">
+  <button class="instr-toggle" id="instr-toggle" onclick="toggleInstructions()">
+    <span>How to use this guide ▾</span>
+    <span class="arrow" id="instr-arrow">▾</span>
+  </button>
+  <div class="instr-body" id="instr-body">
+    <p style="font-size:14px;color:var(--fg-secondary);line-height:1.65;max-width:640px;">Engineers fail EMC testing not because they can't design — but because they start routing before the product is truly defined. This guide forces the decision-making that should happen <em>before</em> you open your schematic tool.</p>
+    <div class="instr-grid">
+      <div class="instr-item">
+        <span class="instr-num">01</span>
+        <div class="instr-text"><strong>Work through each item</strong> — don't skip. If you can't answer something, that gap is exactly what needs resolving first.</div>
+      </div>
+      <div class="instr-item">
+        <span class="instr-num">02</span>
+        <div class="instr-text"><strong>Rate your confidence</strong> honestly with stars (1 = guessing, 5 = locked in). Low stars = conversations to have before you proceed.</div>
+      </div>
+      <div class="instr-item">
+        <span class="instr-num">03</span>
+        <div class="instr-text"><strong>Add notes</strong> for context, open questions, or decisions made. These flow into your exported brief.</div>
+      </div>
+      <div class="instr-item">
+        <span class="instr-num">04</span>
+        <div class="instr-text"><strong>Check items</strong> when you're satisfied. Your progress is saved automatically in this browser.</div>
+      </div>
+    </div>
+    <div class="instr-callout">When all four steps are complete, export your <strong>Product Specification Brief</strong> — a structured document ready to share with your team, stakeholders, or for design review.</div>
+  </div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <span class="progress-label" id="progress-label">0%</span>
+  </div>
+  <span class="saved-dot" id="saved-dot">Saved</span>
+  <button class="btn-primary" onclick="exportBrief()">Export Brief →</button>
+  <button class="btn-ghost" onclick="showReset()">Reset</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- STEP NAV -->
+  <aside class="step-nav">
+    <div class="step-nav-title">Steps</div>
+    <button class="step-btn" id="nav-s1" onclick="scrollToSection('s1')">
+      <span class="step-dot"></span>
+      <div><span class="step-btn-num">01</span> Product Vision</div>
+    </button>
+    <button class="step-btn" id="nav-s2" onclick="scrollToSection('s2')">
+      <span class="step-dot"></span>
+      <div><span class="step-btn-num">02</span> Technical Requirements</div>
+    </button>
+    <button class="step-btn" id="nav-s3" onclick="scrollToSection('s3')">
+      <span class="step-dot"></span>
+      <div><span class="step-btn-num">03</span> Architecture & Interfaces</div>
+    </button>
+    <button class="step-btn" id="nav-s4" onclick="scrollToSection('s4')">
+      <span class="step-dot"></span>
+      <div><span class="step-btn-num">04</span> Compliance & Risk</div>
+    </button>
+  </aside>
+
+  <!-- CATEGORIES -->
+  <div class="categories" id="categories"></div>
+</div>
+
+<!-- RESET MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2>Reset all progress?</h2>
+    <p>This will clear all checkboxes, star ratings, and notes. Your exported briefs are not affected.</p>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="confirmReset()">Yes, reset everything</button>
+      <button class="btn-secondary" onclick="hideReset()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <span class="footer-brand">Fresu Electronics</span>
+    <a href="https://www.fresuelectronics.com" style="font-size:12px;color:var(--label)">fresuelectronics.com</a>
+    <span class="footer-legal">© 2026 Fresu Electronics SRL · All rights reserved</span>
+  </div>
+</footer>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+
+const DATA = [
+  {
+    id: 's1',
+    step: 'Step 01',
+    title: 'Product Vision',
+    desc: 'Who is this for, what problem does it solve, and why does the world need it now? If you can\'t answer these clearly, no stack-up in the world will save you.',
+    items: [
+      { id: 'pv1', label: 'Problem definition', hint: 'What specific problem does this product solve? State it in one sentence.' },
+      { id: 'pv2', label: 'Target user', hint: 'Who will use this product? Be specific — role, industry, context of use.' },
+      { id: 'pv3', label: 'Market opportunity', hint: 'Why now? What gap or trend makes this the right moment?' },
+      { id: 'pv4', label: 'Success criteria', hint: 'How will you know this product is successful? What does "done" look like in 12 months?' },
+      { id: 'pv5', label: 'Competitive differentiation', hint: 'What makes this distinctly better than existing solutions?' },
+    ]
+  },
+  {
+    id: 's2',
+    step: 'Step 02',
+    title: 'Technical Requirements',
+    desc: 'Translate the product vision into engineering constraints. Every vague requirement here becomes a costly rework later.',
+    items: [
+      { id: 'tr1', label: 'Performance specifications', hint: 'Key metrics: speed, accuracy, range, resolution, throughput — with target values and tolerances.' },
+      { id: 'tr2', label: 'Power budget', hint: 'Supply voltage(s), max current draw, battery life target (if applicable), efficiency target.' },
+      { id: 'tr3', label: 'Environmental conditions', hint: 'Operating temperature range, humidity, altitude, vibration, ingress protection (IP rating).' },
+      { id: 'tr4', label: 'Form factor & mechanical constraints', hint: 'PCB size limits, enclosure type, connector placement, mounting requirements.' },
+      { id: 'tr5', label: 'BOM and cost target', hint: 'Target unit cost at volume (1k, 10k, 100k units). Key cost drivers identified.' },
+      { id: 'tr6', label: 'Reliability & lifetime', hint: 'Expected product lifetime, MTBF target, key failure modes to design against.' },
+    ]
+  },
+  {
+    id: 's3',
+    step: 'Step 03',
+    title: 'Architecture & Interfaces',
+    desc: 'Define what connects to what before you assign a single footprint. The block diagram is the design.',
+    items: [
+      { id: 'ai1', label: 'Top-level block diagram', hint: 'Sketch or describe the major functional blocks and their interconnections. Attach if available.' },
+      { id: 'ai2', label: 'Key component selection', hint: 'MCU/processor, FPGAs, key ICs, sensors, power components — initial candidates identified.' },
+      { id: 'ai3', label: 'External interfaces', hint: 'All connectors and communication protocols: USB, Ethernet, CAN, SPI, I²C, RS-485, RF, etc.' },
+      { id: 'ai4', label: 'Signal integrity critical nets', hint: 'Identify high-speed, differential, or noise-sensitive signals that will drive layout decisions.' },
+      { id: 'ai5', label: 'PCB stack-up requirements', hint: 'Layer count estimate, controlled impedance requirements, EMI shielding needs.' },
+    ]
+  },
+  {
+    id: 's4',
+    step: 'Step 04',
+    title: 'Compliance & Risk',
+    desc: 'Decide which certifications you\'re targeting before the first trace is placed. Retrofitting compliance is 3× more expensive than designing for it.',
+    items: [
+      { id: 'cr1', label: 'Target certifications', hint: 'FCC, CE (RED/EMC/LVD), UL, UKCA, RoHS, REACH, automotive (AEC-Q, IATF), medical (IEC 60601), etc.' },
+      { id: 'cr2', label: 'EMC strategy defined', hint: 'Filter approach, shielding plan, PCB-level EMI mitigation strategy outlined at architecture level.' },
+      { id: 'cr3', label: 'Safety standards', hint: 'IEC 62368-1 (AV/IT), IEC 60601 (medical), ISO 26262 (automotive) — applicable standards identified.' },
+      { id: 'cr4', label: 'Supply chain risk', hint: 'Long-lead components identified. Single-source ICs flagged. Availability checked against project timeline.' },
+      { id: 'cr5', label: 'Development timeline', hint: 'Key milestones defined: schematic complete, layout complete, first article, DVT, compliance testing, production.' },
+    ]
+  }
+];
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+
+const STORAGE_KEY = 'fresu_hwspec_v3';
+let state = {};
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    state = raw ? JSON.parse(raw) : {};
+  } catch(e) { state = {}; }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch(e) {}
+  showSaved();
+}
+
+function getItem(id) {
+  return state[id] || { checked: false, stars: 0, notes: '' };
+}
+
+// ─── RENDER ─────────────────────────────────────────────────────────────────
+
+function starSVG(filled) {
+  const fill = filled ? 'currentColor' : 'none';
+  return `<svg viewBox="0 0 24 24" fill="${fill}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+}
+
+function render() {
+  const cont = document.getElementById('categories');
+  let html = '';
+  DATA.forEach(cat => {
+    const itemsDone = cat.items.filter(it => getItem(it.id).checked).length;
+    const allDone = itemsDone === cat.items.length;
+    html += `<div class="cat-card${allDone ? ' active-card' : ''}" id="${cat.id}">`;
+    html += `<div class="cat-header">`;
+    html += `<div class="cat-step">${cat.step}</div>`;
+    html += `<h2 class="cat-title">${cat.title}</h2>`;
+    html += `<p class="cat-desc">${cat.desc}</p>`;
+    html += `</div>`;
+    html += `<div class="cat-body">`;
+    cat.items.forEach(item => {
+      const s = getItem(item.id);
+      const notesOpen = s.notes ? ' open' : '';
+      html += `<div class="item" id="item-${item.id}">`;
+      html += `<div class="item-row">`;
+      html += `<div class="item-check${s.checked ? ' checked' : ''}" onclick="toggleCheck('${item.id}')" role="checkbox" aria-checked="${s.checked}" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleCheck('${item.id}')"></div>`;
+      html += `<div class="item-content">`;
+      html += `<div class="item-label" onclick="toggleCheck('${item.id}')">${item.label}</div>`;
+      if (item.hint) html += `<div class="item-hint">${item.hint}</div>`;
+      html += `<div class="item-meta">`;
+      html += `<div class="item-stars">`;
+      for (let i = 1; i <= 5; i++) {
+        html += `<span class="star${i <= s.stars ? ' lit' : ''}" onclick="setStar('${item.id}',${i})">${starSVG(i <= s.stars)}</span>`;
+      }
+      html += `</div>`;
+      html += `<button class="notes-toggle" onclick="toggleNotes('${item.id}')">${s.notes ? 'Edit note' : '+ Note'}</button>`;
+      html += `</div>`;
+      html += `<div class="item-notes${notesOpen}" id="notes-${item.id}">`;
+      html += `<textarea placeholder="Add context, decisions, or open questions…" oninput="setNotes('${item.id}',this.value)">${s.notes || ''}</textarea>`;
+      html += `</div>`;
+      html += `</div></div></div>`;
+    });
+    html += `</div></div>`;
+  });
+  cont.innerHTML = html;
+  updateProgress();
+  updateStepNav();
+}
+
+// ─── ACTIONS ────────────────────────────────────────────────────────────────
+
+function toggleCheck(id) {
+  const s = getItem(id);
+  state[id] = { ...s, checked: !s.checked };
+  saveState();
+  // Re-render just this item and progress
+  const itemEl = document.getElementById(`item-${id}`);
+  const checkEl = itemEl.querySelector('.item-check');
+  if (state[id].checked) checkEl.classList.add('checked');
+  else checkEl.classList.remove('checked');
+  checkEl.setAttribute('aria-checked', state[id].checked);
+  updateProgress();
+  updateStepNav();
+  // Update card border
+  const cat = DATA.find(c => c.items.some(it => it.id === id));
+  if (cat) {
+    const allDone = cat.items.every(it => getItem(it.id).checked);
+    const card = document.getElementById(cat.id);
+    if (allDone) card.classList.add('active-card');
+    else card.classList.remove('active-card');
+  }
+}
+
+function setStar(id, n) {
+  const s = getItem(id);
+  // Toggle off if clicking same star
+  const newStars = s.stars === n ? 0 : n;
+  state[id] = { ...s, stars: newStars };
+  saveState();
+  const itemEl = document.getElementById(`item-${id}`);
+  itemEl.querySelectorAll('.star').forEach((el, i) => {
+    if (i < newStars) { el.classList.add('lit'); el.innerHTML = starSVG(true); }
+    else { el.classList.remove('lit'); el.innerHTML = starSVG(false); }
+  });
+}
+
+function toggleNotes(id) {
+  const notesEl = document.getElementById(`notes-${id}`);
+  const isOpen = notesEl.classList.contains('open');
+  notesEl.classList.toggle('open');
+  const btn = notesEl.previousElementSibling.querySelector('.notes-toggle');
+  if (!isOpen) { btn.textContent = 'Close note'; notesEl.querySelector('textarea').focus(); }
+  else { const s = getItem(id); btn.textContent = s.notes ? 'Edit note' : '+ Note'; }
+}
+
+function setNotes(id, val) {
+  const s = getItem(id);
+  state[id] = { ...s, notes: val };
+  saveState();
+  // Update toggle label
+  const btn = document.querySelector(`#notes-${id}`).previousElementSibling.querySelector('.notes-toggle');
+  if (btn) btn.textContent = val ? 'Edit note' : '+ Note';
+}
+
+// ─── PROGRESS ───────────────────────────────────────────────────────────────
+
+function updateProgress() {
+  const total = DATA.reduce((acc, c) => acc + c.items.length, 0);
+  const done = DATA.reduce((acc, c) => acc + c.items.filter(it => getItem(it.id).checked).length, 0);
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = pct + '%';
+}
+
+function updateStepNav() {
+  DATA.forEach(cat => {
+    const btn = document.getElementById('nav-' + cat.id);
+    if (!btn) return;
+    const done = cat.items.every(it => getItem(it.id).checked);
+    if (done) btn.classList.add('done'); else btn.classList.remove('done');
+  });
+}
+
+// ─── NAV SCROLL ─────────────────────────────────────────────────────────────
+
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  DATA.forEach(c => document.getElementById('nav-' + c.id).classList.remove('active'));
+  document.getElementById('nav-' + id).classList.add('active');
+}
+
+// Highlight nav on scroll
+let scrollTimer;
+window.addEventListener('scroll', () => {
+  clearTimeout(scrollTimer);
+  scrollTimer = setTimeout(() => {
+    DATA.forEach(cat => {
+      const el = document.getElementById(cat.id);
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.top < 160 && rect.bottom > 80) {
+        DATA.forEach(c => document.getElementById('nav-' + c.id).classList.remove('active'));
+        document.getElementById('nav-' + cat.id).classList.add('active');
+      }
+    });
+  }, 80);
+});
+
+// ─── INSTRUCTIONS ───────────────────────────────────────────────────────────
+
+function toggleInstructions() {
+  const body = document.getElementById('instr-body');
+  const toggle = document.getElementById('instr-toggle');
+  const open = body.classList.toggle('open');
+  toggle.classList.toggle('open', open);
+}
+
+// ─── SAVED ──────────────────────────────────────────────────────────────────
+
+let savedTimer;
+function showSaved() {
+  const el = document.getElementById('saved-dot');
+  el.classList.add('show');
+  clearTimeout(savedTimer);
+  savedTimer = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+// ─── RESET ──────────────────────────────────────────────────────────────────
+
+function showReset() { document.getElementById('overlay').classList.add('open'); }
+function hideReset() { document.getElementById('overlay').classList.remove('open'); }
+function confirmReset() {
+  state = {};
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+  hideReset();
+  render();
+}
+
+// ─── EXPORT ─────────────────────────────────────────────────────────────────
+
+function exportBrief() {
+  const date = new Date().toISOString().split('T')[0];
+  let brief = '';
+  brief += '═══════════════════════════════════════════════════════════════\n';
+  brief += '  PRODUCT SPECIFICATION BRIEF\n';
+  brief += '  Generated by the Hardware Specification Guide\n';
+  brief += '  Fresu Electronics — fresuelectronics.com\n';
+  brief += `  ${date}\n`;
+  brief += '═══════════════════════════════════════════════════════════════\n\n';
+
+  const total = DATA.reduce((acc, c) => acc + c.items.length, 0);
+  const done = DATA.reduce((acc, c) => acc + c.items.filter(it => getItem(it.id).checked).length, 0);
+  brief += `Overall Completion: ${done} / ${total} items (${Math.round(done/total*100)}%)\n\n`;
+
+  DATA.forEach((cat, ci) => {
+    const catDone = cat.items.filter(it => getItem(it.id).checked).length;
+    const avgStars = cat.items.reduce((sum, it) => sum + getItem(it.id).stars, 0) / cat.items.length;
+    brief += `───────────────────────────────────────────────────────────────\n`;
+    brief += `${cat.step.toUpperCase()} — ${cat.title.toUpperCase()}\n`;
+    brief += `Progress: ${catDone} / ${cat.items.length}   `;
+    brief += `Confidence: ${'★'.repeat(Math.round(avgStars))}${'☆'.repeat(5-Math.round(avgStars))}\n`;
+    brief += `───────────────────────────────────────────────────────────────\n\n`;
+    cat.items.forEach(item => {
+      const s = getItem(item.id);
+      const check = s.checked ? '[✓]' : '[ ]';
+      const stars = s.stars > 0 ? '★'.repeat(s.stars) + '☆'.repeat(5-s.stars) : '☆☆☆☆☆';
+      brief += `${check} ${item.label}  ${stars}\n`;
+      if (s.notes && s.notes.trim()) {
+        s.notes.trim().split('\n').forEach(line => { brief += `    → ${line}\n`; });
+      }
+      brief += '\n';
+    });
+  });
+
+  brief += '═══════════════════════════════════════════════════════════════\n';
+  brief += '  Next Step: Open your schematic tool — you\'re ready.\n';
+  brief += '  Questions? fresuelectronics.com/emc-audit\n';
+  brief += '  © 2026 Fresu Electronics SRL — All rights reserved\n';
+  brief += '═══════════════════════════════════════════════════════════════\n';
+
+  const blob = new Blob([brief], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `product-spec-brief-${date}.txt`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+// ─── INIT ───────────────────────────────────────────────────────────────────
+
+loadState();
+render();
+document.getElementById('nav-s1').classList.add('active');
+</script>
+</body>
+</html>
