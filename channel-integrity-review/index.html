@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Is the Channel Intact? Layout EMC Review — Fresu EMC Academy</title>
+<meta name="description" content="A PCB layout EMC review built around one question: is the propagation channel continuous here? By Dario Fresu.">
+<link rel="canonical" href="https://tool.fresuelectronics.com/channel-integrity-review/">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--s1:#111111;--s2:#181818;--brd:#242424;--fg:#ffffff;--fg2:#e8edf5;--lbl:#a0aab8;--dim:#6b7d8f;--acc:#00FF94;--acc-d:rgba(0,255,148,0.08);--acc-b:rgba(0,255,148,0.2);--warn:#ffb400;--warn-d:rgba(255,180,0,0.08);--err:#ff4d4d;--err-d:rgba(255,77,77,0.08);--blue:#6496ff;--blue-d:rgba(100,150,255,0.08)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);color:var(--fg);font-family:'Poppins',sans-serif;-webkit-font-smoothing:antialiased}
+body{min-height:100vh}
+a{color:var(--acc);text-decoration:none}
+.nav{background:rgba(10,10,10,0.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--brd);padding:10px 0;position:sticky;top:0;z-index:100}
+.nav-in{max-width:900px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo{height:34px;width:auto}
+.nav-title{font-size:12px;font-weight:700;color:var(--fg);line-height:1.2}
+.nav-sub{font-size:9px;color:var(--lbl);font-weight:600;letter-spacing:0.1em;text-transform:uppercase}
+.nav-cta{background:var(--acc);color:#0a0a0a;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:7px 14px;border-radius:2px;text-decoration:none;transition:opacity 0.2s;white-space:nowrap}
+.nav-cta:hover{opacity:0.88}
+.main{max-width:760px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
+.kicker{font-size:9px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--acc);margin-bottom:0.625rem;display:flex;align-items:center;gap:8px}
+.kicker::before{content:'';display:block;width:18px;height:1px;background:var(--acc)}
+h1{font-size:clamp(24px,3.5vw,30px);font-weight:800;line-height:1.2;margin-bottom:0.625rem}
+h1 em{font-style:normal;color:var(--acc)}
+.intro{font-size:14px;color:var(--lbl);line-height:1.7;max-width:560px;margin-bottom:1.5rem}
+.score-panel{background:var(--s1);border:1px solid var(--brd);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:16px}
+.sp-num{font-size:26px;font-weight:800;min-width:60px;flex-shrink:0;transition:color 0.3s}
+.sp-track{flex:1}
+.sp-lbl{font-size:10px;color:var(--lbl);margin-bottom:5px}
+.sp-bg{height:5px;background:var(--brd);border-radius:999px;overflow:hidden}
+.sp-fill{height:100%;border-radius:999px;transition:width 0.4s cubic-bezier(0.22,1,0.36,1),background 0.3s}
+.sp-verdict{font-size:11px;font-weight:600;margin-top:4px;transition:color 0.3s}
+.section{margin-bottom:8px;border:1px solid var(--brd);border-radius:10px;overflow:hidden}
+.s-hdr{display:grid;grid-template-columns:44px 1fr 20px;align-items:center;gap:10px;padding:0.875rem 1rem;background:var(--s1);cursor:pointer;transition:background 0.15s;user-select:none}
+.s-hdr:hover,.section.open .s-hdr{background:var(--s2)}
+.s-ico{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.s0 .s-ico{background:var(--acc-d);color:var(--acc)}
+.s1 .s-ico{background:var(--blue-d);color:var(--blue)}
+.s2 .s-ico{background:var(--warn-d);color:var(--warn)}
+.s3 .s-ico{background:var(--err-d);color:var(--err)}
+.s-name{font-size:13px;font-weight:600;color:var(--fg);line-height:1.3}
+.s-sub{font-size:10px;color:var(--dim)}
+.s-chev{font-size:11px;color:var(--dim);transition:transform 0.2s;text-align:center}
+.section.open .s-chev{transform:rotate(180deg);color:var(--acc)}
+.s-body{display:none;border-top:1px solid var(--s2)}
+.section.open .s-body{display:block}
+.item{padding:0.875rem 1rem;border-bottom:1px solid var(--s2);display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start}
+.item:last-child{border-bottom:none}
+.item-q{font-size:12px;color:var(--fg2);line-height:1.55}
+.item-why{font-size:10px;color:var(--dim);margin-top:2px;line-height:1.4}
+.btns{display:flex;gap:4px;flex-shrink:0}
+.btn{font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px;border:1px solid;cursor:pointer;white-space:nowrap;font-family:'Poppins',sans-serif;transition:all 0.15s;background:transparent}
+.by{border-color:var(--acc-b);color:var(--acc)}
+.by.a{background:var(--acc-d);border-color:var(--acc)}
+.bn{border-color:rgba(255,77,77,0.3);color:var(--err)}
+.bn.a{background:var(--err-d);border-color:var(--err)}
+.bna{border-color:var(--brd);color:var(--dim)}
+.bna.a{background:var(--s2);border-color:#333;color:var(--lbl)}
+.verdict{background:var(--s1);border:1px solid;border-radius:10px;padding:1.125rem 1.25rem;margin-top:1rem;display:none}
+.verdict.show{display:block}
+.v-lbl{font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;margin-bottom:5px}
+.v-go{border-color:var(--acc-b)}.v-go .v-lbl{color:var(--acc)}
+.v-flag{border-color:rgba(255,180,0,0.3)}.v-flag .v-lbl{color:var(--warn)}
+.v-stop{border-color:rgba(255,77,77,0.3)}.v-stop .v-lbl{color:var(--err)}
+.v-text{font-size:12px;color:var(--fg2);line-height:1.65}
+.v-text strong{font-weight:600}
+.reset-btn{display:block;width:100%;margin-top:1rem;padding:0.75rem;background:transparent;border:1px solid var(--brd);border-radius:8px;color:var(--dim);font-size:12px;font-weight:500;cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.15s}
+.reset-btn:hover{border-color:#333;color:var(--lbl)}
+.footer{border-top:1px solid var(--brd);padding-top:1.25rem;margin-top:3rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+.footer-l{font-size:11px;color:var(--dim)}.footer-l span{color:var(--acc)}
+.footer-r{font-size:10px;color:var(--dim);font-style:italic}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-in">
+    <a class="nav-brand" href="https://tool.fresuelectronics.com">
+      <img class="nav-logo" src="https://raw.githubusercontent.com/dariofresu/Fresu-Electronics-Blog/main/assets/logo.png" alt="Fresu Electronics">
+      <div>
+        <div class="nav-title">Fresu EMC Academy</div>
+        <div class="nav-sub">Reference Tools</div>
+      </div>
+    </a>
+    <a class="nav-cta" href="https://www.skool.com/pcb-design-mastery-9530" target="_blank">Join the Academy →</a>
+  </div>
+</nav>
+<main class="main">
+  <div class="kicker">Fresu EMC Academy · Interactive Tool 02</div>
+  <h1>Is the <em>channel</em> intact?</h1>
+  <p class="intro">A layout EMC review built around one question per checkpoint. Every section asks: is the propagation channel continuous here? Mark each checkpoint as you review your layout.</p>
+
+  <div class="score-panel">
+    <div class="sp-num" id="spNum" style="color:var(--lbl)">—</div>
+    <div class="sp-track">
+      <div class="sp-lbl" id="spLbl">Review your layout checkpoint by checkpoint</div>
+      <div class="sp-bg"><div class="sp-fill" id="spFill" style="width:0%;background:var(--acc)"></div></div>
+      <div class="sp-verdict" id="spVerdict"></div>
+    </div>
+  </div>
+
+  <div id="sections"></div>
+  <button class="reset-btn" onclick="resetAll()">Reset all checkpoints</button>
+  <div class="verdict" id="verdict"><div class="v-lbl" id="vLbl"></div><div class="v-text" id="vText"></div></div>
+
+  <div class="footer">
+    <div class="footer-l">Fresu EMC Academy · <span>fresuelectronics.com</span></div>
+    <div class="footer-r">EMC problems are signal integrity problems in disguise</div>
+  </div>
+</main>
+
+<script>
+const data=[
+  {id:'s0',cls:'s0',num:'01',name:'Stack-up pairing',sub:'Are both boundaries correctly assigned?',items:[
+    {q:'Every signal layer is paired with a dedicated RRP — not a power plane',why:'Power planes have splits. A power plane as reference means the channel breaks wherever splits occur.'},
+    {q:'The RRP is adjacent to the signal layer with minimal dielectric thickness between them',why:'The closer the RRP, the tighter the field containment in the dielectric between the pair.'},
+    {q:'Power layers are also paired: each power layer references its own adjacent RRP',why:'Energy delivery also happens in the dielectric. Power layers need their own return reference boundary.'},
+    {q:'Layer pairing confirmed in the physical stackup — not just the schematic layer list',why:'PCB houses sometimes substitute materials. Verify the manufactured stack matches the EM architecture.'},
+    {q:'Dielectric thickness between paired layers is smaller than between unpaired layers',why:'If layer 3 is closer to layer 4 (power) than to layer 2 (its RRP), it will use the power plane as reference.'},
+  ]},
+  {id:'s1',cls:'s1',num:'02',name:'RRP continuity',sub:'Is the containment structure solid?',items:[
+    {q:'The RRP has no splits, cuts, or gaps under any signal trace',why:'Any gap forces the field channel to find an alternative boundary. The gap becomes a slot antenna.'},
+    {q:'No signal trace crosses a plane split or gap — even on adjacent layers',why:'A signal crossing a gap in a reference layer below it loses its containment boundary at that crossing.'},
+    {q:'The RRP is a solid plane — not a copper pour connected at a single point',why:'"Ground" is an outdated concept. A polygon connected at one point still has impedance and can resonate.'},
+    {q:'Stitching vias connect both RRPs where two planes are used, making them equipotential',why:'Two planes that are not equipotential create a cavity between them with its own resonant frequency.'},
+    {q:'Stitching via density pushes the plane cavity resonant frequency above the EMC test range',why:'More stitching vias = smaller cavity = higher resonant frequency = resonance outside the test window.'},
+  ]},
+  {id:'s2',cls:'s2',num:'03',name:'Layer transitions (RRV)',sub:'Is the channel maintained through vias?',items:[
+    {q:'Every signal via has at least one adjacent Return Reference Via (RRV) to the nearest RRP',why:'When a signal changes layer, its field channel must also transition. Without an RRV the channel breaks at the via.'},
+    {q:'RRVs are placed as close as physically possible to the signal via',why:'Distance between signal via and RRV determines the size of the transition loop created.'},
+    {q:'RRVs connect to the same RRP that the signal layer references — not any random plane',why:'The RRV must close the channel to the correct boundary layer, not just any nearby conductor.'},
+    {q:'High-current GND pads have in-pad vias or vias placed directly adjacent to the pad',why:'Without direct vias, return current finds a longer path → common-mode source → increased emissions.'},
+    {q:'360-degree via structures used on critical high-speed transitions where feasible',why:'360 degrees gives the return field the shortest, most symmetrical path at every layer change.'},
+  ]},
+  {id:'s3',cls:'s3',num:'04',name:'Field environment',sub:'Is every conductor accounted for?',items:[
+    {q:'No isolated copper islands or pours connected at a single point on any layer',why:'Isolated conductors have no defined boundary partner. They interact with field channels unpredictably.'},
+    {q:'Copper pours adjacent to signal traces verified not to alter characteristic impedance',why:'Any conductor placed near a trace modifies the electric field distribution — changing the impedance the channel sees.'},
+    {q:'Traces in dense areas spaced to reduce inter-channel field coupling (crosstalk)',why:'Fields from one channel can enter an adjacent channel. Spacing controls the coupling coefficient.'},
+    {q:'No critical signal traces routed within 3× trace width of the board edge',why:'At the board edge, one boundary of the channel disappears. Fields expand outward uncontained.'},
+    {q:'Any mechanical cavity (e.g. between carrier board and module) checked for resonant frequency',why:'A cavity between two boards carrying high-speed signals can resonate at a frequency in the EMC test range.'},
+  ]},
+];
+const state={};
+data.forEach(s=>s.items.forEach((_,i)=>state[s.id+'_'+i]=null));
+
+function render(){
+  const el=document.getElementById('sections');
+  el.innerHTML=data.map((s,si)=>`
+    <div class="section ${s.cls}${si===0?' open':''}" id="sec${si}">
+      <div class="s-hdr" onclick="tog(${si})">
+        <div class="s-ico">${s.num}</div>
+        <div><div class="s-name">${s.name}</div><div class="s-sub">${s.sub}</div></div>
+        <div class="s-chev">▾</div>
+      </div>
+      <div class="s-body">
+        ${s.items.map((it,i)=>{const k=s.id+'_'+i;const v=state[k];return`<div class="item"><div><div class="item-q">${it.q}</div><div class="item-why">${it.why}</div></div><div class="btns"><button class="btn by${v==='y'?' a':''}" onclick="mark('${s.id}',${i},'y')">Yes</button><button class="btn bn${v==='n'?' a':''}" onclick="mark('${s.id}',${i},'n')">No</button><button class="btn bna${v==='na'?' a':''}" onclick="mark('${s.id}',${i},'na')">N/A</button></div></div>`;}).join('')}
+      </div>
+    </div>`).join('');
+  updateScore();
+}
+
+function tog(i){document.getElementById('sec'+i).classList.toggle('open');}
+
+function mark(sid,idx,v){const k=sid+'_'+idx;state[k]=state[k]===v?null:v;render();}
+
+function updateScore(){
+  const vals=Object.values(state);
+  const done=vals.filter(v=>v!==null).length;
+  const yes=vals.filter(v=>v==='y').length;
+  const no=vals.filter(v=>v==='n').length;
+  const total=vals.length;
+  const $=id=>document.getElementById(id);
+  if(!done){$('spNum').textContent='—';$('spNum').style.color='var(--lbl)';$('spLbl').textContent='Review your layout checkpoint by checkpoint';$('spVerdict').textContent='';$('spFill').style.width='0%';$('verdict').classList.remove('show');return;}
+  const pct=Math.round((yes/done)*100);
+  $('spNum').textContent=pct+'%';
+  $('spNum').style.color=no>0?'var(--err)':pct>=80?'var(--acc)':'var(--warn)';
+  $('spFill').style.width=pct+'%';
+  $('spFill').style.background=no>0?'var(--err)':pct>=80?'var(--acc)':'var(--warn)';
+  $('spLbl').textContent=`${done}/${total} reviewed · ${yes} intact · ${no} broken · ${vals.filter(v=>v==='na').length} N/A`;
+  $('spVerdict').textContent=no>0?`⚠ ${no} broken channel${no>1?'s':''} — address before test submission`:(pct===100&&done===total)?'✓ All channels verified intact':'Continue reviewing remaining checkpoints';
+  $('spVerdict').style.color=no>0?'var(--err)':pct>=80?'var(--acc)':'var(--warn)';
+  if(done===total){
+    const vb=$('verdict');vb.classList.add('show');
+    const vl=$('vLbl');const vt=$('vText');
+    if(no>2){vb.className='verdict show v-stop';vl.textContent='STOP — Channels are broken';vt.innerHTML=`<strong>${no} broken channels in this layout.</strong> The fields have multiple escape paths. These will generate emissions at test. Resolve each "No" before submitting — the fixes at this stage are routing changes, not components.`;}
+    else if(no>0){vb.className='verdict show v-flag';vl.textContent='PROCEED WITH CAUTION';vt.innerHTML=`<strong>${no} channel issue${no>1?'s':''} flagged.</strong> Document each broken channel with the specific trace, layer, and location. Fix before test if possible — each is a known radiation source.`;}
+    else{vb.className='verdict show v-go';vl.textContent='CHANNELS INTACT';vt.innerHTML=`All propagation channels verified intact. The electromagnetic architecture is sound. If issues appear at test, they are likely in the interfaces or mechanical/cable setup — not the board layout.`;}
+  }
+}
+
+function resetAll(){Object.keys(state).forEach(k=>state[k]=null);render();}
+render();
+</script>
+</body>
+</html>
