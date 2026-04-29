@@ -17,10 +17,10 @@
   --accent: #00FF94; --accent-dim: rgba(0,255,148,.10);
   --ease: cubic-bezier(0.22,1,0.36,1);
 }
-html { scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--fg); font-family: 'Poppins', sans-serif; line-height: 1.7; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
+body { background: var(--bg); color: var(--fg); font-family: 'Poppins', sans-serif; line-height: 1.7; overflow-x: hidden; }
 a { text-decoration: none; }
-img { display: block; }
+img { display: block; max-width: 100%; }
 
 /* NAV */
 .nav { background: rgba(10,10,10,.95); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); padding: 12px 0; position: sticky; top: 0; z-index: 100; }
@@ -49,9 +49,10 @@ img { display: block; }
 /* GRIDS */
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-bottom: 2px; }
 .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; }
+.grid-3 > *, .grid-2 > * { min-width: 0; }
 
 /* CARD */
-.card { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--border); padding: 24px; display: flex; flex-direction: column; gap: 12px; transition: border-color .2s; }
+.card { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--border); padding: 24px; display: flex; flex-direction: column; gap: 12px; transition: border-color .2s; min-width: 0; overflow: hidden; }
 .card:hover { border-color: rgba(0,255,148,.4); }
 .card.hi { border-left-color: var(--accent); }
 .card-tag { font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); display: flex; align-items: center; gap: 6px; }
